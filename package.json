@@ -1,0 +1,22 @@
+{
+  "name": "photo-gallery",
+  "version": "1.0.0",
+  "description": "A beautiful photo gallery website with infinite scroll and modal view",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "keywords": [
+    "photo",
+    "gallery",
+    "website",
+    "infinite-scroll",
+    "modal"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+} 
