@@ -145,22 +145,37 @@ body {
 
 .modal-content {
     position: relative;
-    max-width: 90vw;
-    max-height: 90vh;
+    max-width: 95vw;
+    max-height: 95vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .modal-image {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    border-radius: 8px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
     cursor: zoom-in;
     transition: transform 0.3s ease;
     transform-origin: center;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+/* Better handling for horizontal images */
+.modal-image.horizontal {
+    max-width: 90vw;
+    max-height: 85vh;
+}
+
+/* Better handling for vertical images */
+.modal-image.vertical {
+    max-width: 70vw;
+    max-height: 90vh;
 }
 
 .modal-image.zoomed {
@@ -269,6 +284,17 @@ body {
         height: 35px;
         font-size: 1.2rem;
     }
+    
+    /* Mobile improvements for horizontal images */
+    .modal-image.horizontal {
+        max-width: 95vw;
+        max-height: 80vh;
+    }
+    
+    .modal-image.vertical {
+        max-width: 85vw;
+        max-height: 85vh;
+    }
 }
 
 @media (max-width: 480px) {
@@ -291,6 +317,21 @@ body {
     
     .subtitle {
         font-size: 1.1rem;
+    }
+    
+    /* Small screen improvements */
+    .modal-content {
+        padding: 10px;
+    }
+    
+    .modal-image.horizontal {
+        max-width: 98vw;
+        max-height: 75vh;
+    }
+    
+    .modal-image.vertical {
+        max-width: 90vw;
+        max-height: 80vh;
     }
 }
 

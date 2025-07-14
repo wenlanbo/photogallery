@@ -160,6 +160,7 @@ class PhotoGallery {
         
         // Show buttons when image loads
         this.modalImage.onload = () => {
+            this.adjustImageOrientation();
             this.showModalButtons();
             this.updateNavigationButtons();
         };
@@ -184,6 +185,19 @@ class PhotoGallery {
         this.translateY = 0;
         this.modalImage.classList.remove('zoomed');
         this.modalImage.style.transform = 'scale(1) translate(0px, 0px)';
+    }
+    
+    adjustImageOrientation() {
+        // Remove existing orientation classes
+        this.modalImage.classList.remove('horizontal', 'vertical');
+        
+        // Check image dimensions and apply appropriate class
+        if (this.modalImage.naturalWidth > this.modalImage.naturalHeight) {
+            this.modalImage.classList.add('horizontal');
+        } else if (this.modalImage.naturalHeight > this.modalImage.naturalWidth) {
+            this.modalImage.classList.add('vertical');
+        }
+        // If square, no additional class needed
     }
     
     toggleZoom() {
@@ -253,6 +267,7 @@ class PhotoGallery {
         
         // Show buttons when image loads
         this.modalImage.onload = () => {
+            this.adjustImageOrientation();
             this.showModalButtons();
             this.updateNavigationButtons();
         };
