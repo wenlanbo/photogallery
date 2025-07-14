@@ -1,4 +1,4 @@
-# Exclude large image files from build
+# Exclude large image files from server build
 images/*.JPG
 images/*.jpg
 images/*.PNG
@@ -8,5 +8,8 @@ images/*.dng
 images/*.HEIC
 images/*.heic
 
-# But keep the folder structure
-!images/ 
+# Keep node_modules and other unnecessary files out
+node_modules/
+npm-debug.log*
+.DS_Store
+.env 
