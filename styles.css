@@ -158,6 +158,18 @@ body {
     object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    cursor: zoom-in;
+    transition: transform 0.3s ease;
+    transform-origin: center;
+}
+
+.modal-image.zoomed {
+    cursor: grab;
+    transform: scale(2);
+}
+
+.modal-image.zoomed:active {
+    cursor: grabbing;
 }
 
 .close-btn {

@@ -14,6 +14,14 @@ class PhotoGallery {
         this.page = 1;
         this.photosPerPage = 12;
         
+        // Zoom and pan state
+        this.isZoomed = false;
+        this.isDragging = false;
+        this.startX = 0;
+        this.startY = 0;
+        this.translateX = 0;
+        this.translateY = 0;
+        
         this.init();
     }
     
@@ -140,6 +148,9 @@ class PhotoGallery {
         this.modal.classList.add('active');
         document.body.style.overflow = 'hidden';
         
+        // Reset zoom state
+        this.resetZoom();
+        
         // Hide buttons while loading
         this.hideModalButtons();
         
@@ -163,6 +174,58 @@ class PhotoGallery {
     closeModal() {
         this.modal.classList.remove('active');
         document.body.style.overflow = 'auto';
+        this.resetZoom();
+    }
+    
+    resetZoom() {
+        this.isZoomed = false;
+        this.isDragging = false;
+        this.translateX = 0;
+        this.translateY = 0;
+        this.modalImage.classList.remove('zoomed');
+        this.modalImage.style.transform = 'scale(1) translate(0px, 0px)';
+    }
+    
+    toggleZoom() {
+        if (this.isZoomed) {
+            this.resetZoom();
+        } else {
+            this.isZoomed = true;
+            this.modalImage.classList.add('zoomed');
+            this.modalImage.style.transform = 'scale(2) translate(0px, 0px)';
+        }
+    }
+    
+    startPan(e) {
+        if (!this.isZoomed) return;
+        
+        this.isDragging = true;
+        this.startX = e.clientX - this.translateX;
+        this.startY = e.clientY - this.translateY;
+        this.modalImage.style.cursor = 'grabbing';
+    }
+    
+    pan(e) {
+        if (!this.isZoomed || !this.isDragging) return;
+        
+        this.translateX = e.clientX - this.startX;
+        this.translateY = e.clientY - this.startY;
+        
+        // Limit panning to keep image visible
+        const maxTranslateX = this.modalImage.offsetWidth * 0.5;
+        const maxTranslateY = this.modalImage.offsetHeight * 0.5;
+        
+        this.translateX = Math.max(-maxTranslateX, Math.min(maxTranslateX, this.translateX));
+        this.translateY = Math.max(-maxTranslateY, Math.min(maxTranslateY, this.translateY));
+        
+        this.modalImage.style.transform = `scale(2) translate(${this.translateX}px, ${this.translateY}px)`;
+    }
+    
+    endPan() {
+        if (!this.isZoomed) return;
+        
+        this.isDragging = false;
+        this.modalImage.style.cursor = 'grab';
     }
     
     navigateModal(direction) {
@@ -177,6 +240,9 @@ class PhotoGallery {
         }
         
         const photo = this.photos[this.currentPhotoIndex];
+        
+        // Reset zoom state when navigating
+        this.resetZoom();
         
         // Hide buttons while loading new image
         this.hideModalButtons();
@@ -225,6 +291,27 @@ class PhotoGallery {
         this.prevBtn.addEventListener('click', () => this.navigateModal('prev'));
         this.nextBtn.addEventListener('click', () => this.navigateModal('next'));
         
+        // Image zoom and pan events
+        this.modalImage.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleZoom();
+        });
+        
+        this.modalImage.addEventListener('mousedown', (e) => {
+            if (this.isZoomed) {
+                e.preventDefault();
+                this.startPan(e);
+            }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            this.pan(e);
+        });
+        
+        document.addEventListener('mouseup', () => {
+            this.endPan();
+        });
+        
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (!this.modal.classList.contains('active')) return;
@@ -238,6 +325,10 @@ class PhotoGallery {
                     break;
                 case 'ArrowRight':
                     this.navigateModal('next');
+                    break;
+                case 'z':
+                case 'Z':
+                    this.toggleZoom();
                     break;
             }
         });
