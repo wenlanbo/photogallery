@@ -209,13 +209,15 @@ body {
 }
 
 .modal-nav {
-    position: absolute;
+    position: fixed;
     top: 50%;
     transform: translateY(-50%);
     width: 100%;
     display: flex;
     justify-content: space-between;
     pointer-events: none;
+    z-index: 1001;
+    transition: all 0.3s ease;
 }
 
 .nav-btn {
@@ -231,6 +233,7 @@ body {
     backdrop-filter: blur(10px);
     pointer-events: auto;
     margin: 0 20px;
+    position: relative;
 }
 
 .nav-btn:hover {
@@ -244,6 +247,15 @@ body {
 
 .next-btn {
     right: 20px;
+}
+
+/* When image is zoomed, adjust button positions */
+.modal-image.zoomed ~ .modal-nav {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
 }
 
 /* Responsive design */

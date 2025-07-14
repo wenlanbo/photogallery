@@ -185,6 +185,7 @@ class PhotoGallery {
         this.translateY = 0;
         this.modalImage.classList.remove('zoomed');
         this.modalImage.style.transform = 'scale(1) translate(0px, 0px)';
+        this.updateNavButtonPositions();
     }
     
     adjustImageOrientation() {
@@ -208,6 +209,7 @@ class PhotoGallery {
             this.modalImage.classList.add('zoomed');
             this.modalImage.style.transform = 'scale(2) translate(0px, 0px)';
         }
+        this.updateNavButtonPositions();
     }
     
     startPan(e) {
@@ -233,6 +235,7 @@ class PhotoGallery {
         this.translateY = Math.max(-maxTranslateY, Math.min(maxTranslateY, this.translateY));
         
         this.modalImage.style.transform = `scale(2) translate(${this.translateX}px, ${this.translateY}px)`;
+        this.updateNavButtonPositions();
     }
     
     endPan() {
@@ -240,6 +243,36 @@ class PhotoGallery {
         
         this.isDragging = false;
         this.modalImage.style.cursor = 'grab';
+    }
+    
+    updateNavButtonPositions() {
+        const modalNav = document.querySelector('.modal-nav');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        if (!modalNav || !prevBtn || !nextBtn) return;
+        
+        if (this.isZoomed) {
+            // When zoomed, position buttons relative to viewport
+            const viewportWidth = window.innerWidth;
+            const buttonWidth = 50;
+            const margin = 20;
+            
+            // Calculate positions based on current image translation
+            const leftPosition = Math.max(margin, Math.min(viewportWidth - buttonWidth - margin, margin - this.translateX * 0.5));
+            const rightPosition = Math.max(margin, Math.min(viewportWidth - buttonWidth - margin, viewportWidth - buttonWidth - margin - this.translateX * 0.5));
+            
+            prevBtn.style.left = `${leftPosition}px`;
+            nextBtn.style.right = `${rightPosition}px`;
+            
+            // Ensure buttons stay visible
+            modalNav.style.pointerEvents = 'auto';
+        } else {
+            // Reset to default positions when not zoomed
+            prevBtn.style.left = '20px';
+            nextBtn.style.right = '20px';
+            modalNav.style.pointerEvents = 'none';
+        }
     }
     
     navigateModal(direction) {
@@ -345,6 +378,13 @@ class PhotoGallery {
                 case 'Z':
                     this.toggleZoom();
                     break;
+            }
+        });
+        
+        // Update button positions on window resize
+        window.addEventListener('resize', () => {
+            if (this.modal.classList.contains('active')) {
+                this.updateNavButtonPositions();
             }
         });
     }
