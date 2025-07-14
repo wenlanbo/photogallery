@@ -1,6 +1,11 @@
 const express = require('express');
 const app = express();
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', message: 'Server is running' });
+});
+
 // API endpoint to get photos - returns static file list
 app.get('/api/photos', async (req, res) => {
     try {
@@ -154,6 +159,19 @@ app.get('/api/photos', async (req, res) => {
         
     } catch (error) {
         console.error('Error loading photos:', error);
-        res.status(500).json({ error: 'Failed to load photos' });
+        res.status(500).json({ 
+            error: 'Failed to load photos',
+            details: error.message,
+            stack: error.stack
+        });
     }
+});
+
+// Add error handling middleware
+app.use((error, req, res, next) => {
+    console.error('Server error:', error);
+    res.status(500).json({ 
+        error: 'Internal server error',
+        details: error.message
+    });
 }); 
