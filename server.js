@@ -16,23 +16,25 @@ app.get('/api/photos', async (req, res) => {
         
         // Check if images folder exists
         const imagesPath = path.join(__dirname, 'images');
+        let imageFiles = [];
+        
         try {
             await fs.access(imagesPath);
+            // Get all image files from the images folder
+            const files = await fs.readdir(imagesPath);
+            imageFiles = files.filter(file => {
+                const ext = path.extname(file).toLowerCase();
+                return ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.dng', '.heic'].includes(ext);
+            });
         } catch (error) {
-            // If images folder doesn't exist, return empty array
+            // If images folder doesn't exist or can't be accessed, return empty array
+            console.log('Images folder not accessible, returning empty array');
             return res.json({
                 photos: [],
                 hasMore: false,
                 total: 0
             });
         }
-        
-        // Get all image files from the images folder
-        const files = await fs.readdir(imagesPath);
-        const imageFiles = files.filter(file => {
-            const ext = path.extname(file).toLowerCase();
-            return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
-        });
         
         // Sort files by name
         imageFiles.sort();

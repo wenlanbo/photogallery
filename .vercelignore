@@ -1,3 +1,13 @@
+# Exclude large image files from server build to avoid size limit
+images/*.JPG
+images/*.jpg
+images/*.PNG
+images/*.png
+images/*.DNG
+images/*.dng
+images/*.HEIC
+images/*.heic
+
 # Keep node_modules and other unnecessary files out
 node_modules/
 npm-debug.log*
