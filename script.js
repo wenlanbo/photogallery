@@ -13,95 +13,14 @@ class PhotoGallery {
         this.isLoading = false;
         this.page = 1;
         this.photosPerPage = 12;
-        this.useGoogleDrive = false;
-        this.isAuthenticated = false;
         
         this.init();
     }
     
     async init() {
-        await this.checkAuthStatus();
         this.loadPhotos();
         this.setupEventListeners();
         this.setupInfiniteScroll();
-    }
-    
-    async checkAuthStatus() {
-        try {
-            const response = await fetch('/api/auth/status');
-            const status = await response.json();
-            
-            this.useGoogleDrive = status.hasCredentials;
-            this.isAuthenticated = status.authenticated;
-            
-            console.log('Auth status:', status);
-            
-            // Show authentication button if Google Drive is configured but not authenticated
-            if (this.useGoogleDrive && !this.isAuthenticated) {
-                this.showAuthButton();
-            }
-        } catch (error) {
-            console.error('Error checking auth status:', error);
-            this.useGoogleDrive = false;
-        }
-    }
-    
-    showAuthButton() {
-        // Create auth button if it doesn't exist
-        if (!document.getElementById('authButton')) {
-            const authButton = document.createElement('button');
-            authButton.id = 'authButton';
-            authButton.className = 'auth-button';
-            authButton.textContent = 'Connect to Google Drive';
-            authButton.onclick = () => this.authenticateWithGoogle();
-            
-            // Insert before the gallery
-            this.gallery.parentNode.insertBefore(authButton, this.gallery);
-        }
-    }
-    
-    async authenticateWithGoogle() {
-        try {
-            // Open Google OAuth in a popup window
-            const authWindow = window.open('/auth/google', 'googleAuth', 
-                'width=500,height=600,scrollbars=yes,resizable=yes');
-            
-            // Check if authentication was successful
-            const checkAuth = setInterval(async () => {
-                try {
-                    const response = await fetch('/api/auth/status');
-                    const status = await response.json();
-                    
-                    if (status.authenticated) {
-                        clearInterval(checkAuth);
-                        this.isAuthenticated = true;
-                        
-                        // Remove auth button
-                        const authButton = document.getElementById('authButton');
-                        if (authButton) {
-                            authButton.remove();
-                        }
-                        
-                        // Reload photos from Google Drive
-                        this.photos = [];
-                        this.page = 1;
-                        this.gallery.innerHTML = '';
-                        this.loadPhotos();
-                        
-                        // Close popup
-                        if (authWindow && !authWindow.closed) {
-                            authWindow.close();
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error checking auth status:', error);
-                }
-            }, 1000);
-            
-        } catch (error) {
-            console.error('Error starting authentication:', error);
-            this.showError('Failed to start Google Drive authentication');
-        }
     }
     
     async loadPhotos() {
@@ -137,50 +56,19 @@ class PhotoGallery {
         try {
             console.log(`Fetching photos: page=${this.page}, limit=${this.photosPerPage}`);
             
-            // Try Google Drive API first if configured and authenticated
-            if (this.useGoogleDrive && this.isAuthenticated) {
-                try {
-                    const response = await fetch(`/api/photos?page=${this.page}&limit=${this.photosPerPage}`);
-                    
-                    if (response.status === 401) {
-                        // Authentication expired, try to re-authenticate
-                        this.isAuthenticated = false;
-                        this.showAuthButton();
-                        throw new Error('Authentication expired');
-                    }
-                    
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch photos: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    console.log(`Google Drive API response:`, data);
-                    
-                    if (data.photos.length > 0) {
-                        console.log(`Returning ${data.photos.length} photos from Google Drive`);
-                        return data.photos;
-                    }
-                } catch (error) {
-                    console.error('Google Drive API failed:', error);
-                    // Fall back to static photos
-                }
-            }
-            
-            // Fall back to static photos
-            console.log('Using fallback photos');
-            const response = await fetch(`/api/photos/fallback?page=${this.page}&limit=${this.photosPerPage}`);
+            const response = await fetch(`/api/photos?page=${this.page}&limit=${this.photosPerPage}`);
             
             if (!response.ok) {
-                console.error(`Fallback API response not ok: ${response.status} ${response.statusText}`);
-                throw new Error(`Failed to fetch fallback photos: ${response.status}`);
+                console.error(`API response not ok: ${response.status} ${response.statusText}`);
+                throw new Error(`Failed to fetch photos: ${response.status}`);
             }
             
             const data = await response.json();
-            console.log(`Fallback API response:`, data);
+            console.log(`API response:`, data);
             
-            // If no photos in fallback, use placeholder images
+            // If no photos returned, use placeholder images
             if (data.photos.length === 0 && this.page === 1) {
-                console.log('No photos returned from fallback API, using placeholders');
+                console.log('No photos returned from API, using placeholders');
                 return this.getPlaceholderPhotos();
             }
             
@@ -190,7 +78,7 @@ class PhotoGallery {
                 return [];
             }
             
-            console.log(`Returning ${data.photos.length} fallback photos`);
+            console.log(`Returning ${data.photos.length} photos`);
             return data.photos;
             
         } catch (error) {
