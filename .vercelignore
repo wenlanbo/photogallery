@@ -1,0 +1,12 @@
+# Exclude large image files from build
+images/*.JPG
+images/*.jpg
+images/*.PNG
+images/*.png
+images/*.DNG
+images/*.dng
+images/*.HEIC
+images/*.heic
+
+# But keep the folder structure
+!images/ 
