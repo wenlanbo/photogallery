@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive Link Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #e8f5e8;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #28a745;
+        }
+        .copy-btn {
+            background: #28a745;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background: #1e7e34;
+        }
+        .bulk-converter {
+            margin-top: 30px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Google Drive Link Converter</h1>
+        
+        <div class="step">
+            <h3>Step 1: Upload Images to Google Drive</h3>
+            <p>1. Go to <a href="https://drive.google.com" target="_blank">drive.google.com</a></p>
+            <p>2. Create a new folder called "Photo Gallery Images"</p>
+            <p>3. Upload all your images to this folder</p>
+            <p>4. Make the folder public (right-click → Share → Anyone with link can view)</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Get Share Links</h3>
+            <p>For each image:</p>
+            <p>1. Right-click the image → "Get link"</p>
+            <p>2. Change to "Anyone on the internet can view"</p>
+            <p>3. Copy the link</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Convert Single Link</h3>
+            <p>Paste your Google Drive share link here:</p>
+            <input type="text" id="shareLink" placeholder="https://drive.google.com/file/d/1ABC123DEF456/view?usp=sharing">
+            <button onclick="convertLink()">Convert to Direct Link</button>
+            <div id="singleResult"></div>
+        </div>
+
+        <div class="step bulk-converter">
+            <h3>Step 4: Bulk Convert (Recommended)</h3>
+            <p>Paste all your share links here (one per line):</p>
+            <textarea id="bulkLinks" placeholder="https://drive.google.com/file/d/1ABC123DEF456/view?usp=sharing
+https://drive.google.com/file/d/1DEF456GHI789/view?usp=sharing
+https://drive.google.com/file/d/1GHI789JKL012/view?usp=sharing"></textarea>
+            <button onclick="convertBulk()">Convert All Links</button>
+            <div id="bulkResult"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 5: Update Your Server</h3>
+            <p>Once you have all the direct links, I'll help you update your server.js file with the correct URLs.</p>
+        </div>
+    </div>
+
+    <script>
+        function extractFileId(shareLink) {
+            const match = shareLink.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            return match ? match[1] : null;
+        }
+
+        function convertToDirectLink(shareLink) {
+            const fileId = extractFileId(shareLink);
+            if (!fileId) {
+                return null;
+            }
+            return `https://drive.google.com/uc?export=view&id=${fileId}`;
+        }
+
+        function convertLink() {
+            const shareLink = document.getElementById('shareLink').value.trim();
+            const directLink = convertToDirectLink(shareLink);
+            
+            if (directLink) {
+                const resultDiv = document.getElementById('singleResult');
+                resultDiv.innerHTML = `
+                    <div class="result">
+                        <strong>Direct Link:</strong><br>
+                        <input type="text" value="${directLink}" readonly style="width: 100%; margin: 10px 0;">
+                        <button class="copy-btn" onclick="copyToClipboard('${directLink}')">Copy</button>
+                    </div>
+                `;
+            } else {
+                document.getElementById('singleResult').innerHTML = `
+                    <div style="background: #f8d7da; padding: 15px; border-radius: 4px; border: 1px solid #dc3545; color: #721c24;">
+                        Invalid Google Drive link. Please check the format.
+                    </div>
+                `;
+            }
+        }
+
+        function convertBulk() {
+            const bulkLinks = document.getElementById('bulkLinks').value.trim();
+            const lines = bulkLinks.split('\n').filter(line => line.trim());
+            const results = [];
+            
+            lines.forEach((link, index) => {
+                const directLink = convertToDirectLink(link.trim());
+                if (directLink) {
+                    results.push(directLink);
+                }
+            });
+
+            if (results.length > 0) {
+                const resultDiv = document.getElementById('bulkResult');
+                resultDiv.innerHTML = `
+                    <div class="result">
+                        <strong>Converted ${results.length} links:</strong><br>
+                        <textarea readonly style="width: 100%; height: 150px; margin: 10px 0;">${results.join('\n')}</textarea>
+                        <button class="copy-btn" onclick="copyToClipboard('${results.join('\n')}')">Copy All</button>
+                    </div>
+                `;
+            } else {
+                document.getElementById('bulkResult').innerHTML = `
+                    <div style="background: #f8d7da; padding: 15px; border-radius: 4px; border: 1px solid #dc3545; color: #721c24;">
+                        No valid links found. Please check your input.
+                    </div>
+                `;
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html> 
