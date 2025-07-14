@@ -54,27 +54,35 @@ class PhotoGallery {
     
     async fetchPhotos() {
         try {
+            console.log(`Fetching photos: page=${this.page}, limit=${this.photosPerPage}`);
             const response = await fetch(`/api/photos?page=${this.page}&limit=${this.photosPerPage}`);
+            
             if (!response.ok) {
-                throw new Error('Failed to fetch photos');
+                console.error(`API response not ok: ${response.status} ${response.statusText}`);
+                throw new Error(`Failed to fetch photos: ${response.status}`);
             }
             
             const data = await response.json();
+            console.log(`API response:`, data);
             
             // If no photos in images folder, fall back to placeholder images
             if (data.photos.length === 0 && this.page === 1) {
+                console.log('No photos returned from API, using placeholders');
                 return this.getPlaceholderPhotos();
             }
             
             // Return empty array if no more photos (end of pagination)
             if (data.photos.length === 0) {
+                console.log('No more photos available');
                 return [];
             }
             
+            console.log(`Returning ${data.photos.length} photos`);
             return data.photos;
         } catch (error) {
             console.error('Error fetching photos:', error);
             // Fall back to placeholder images if server is not running
+            console.log('Using placeholder photos due to error');
             return this.getPlaceholderPhotos();
         }
     }

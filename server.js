@@ -8,6 +8,8 @@ app.get('/api/photos', async (req, res) => {
         const limit = parseInt(req.query.limit) || 12;
         const offset = (page - 1) * limit;
         
+        console.log(`API called: page=${page}, limit=${limit}, offset=${offset}`);
+        
         // Static list of your photos (generated from your images folder)
         const allPhotos = [
             { id: 0, src: '/images/211-4.JPG', alt: '211-4', thumbnail: '/images/211-4.JPG' },
@@ -141,6 +143,8 @@ app.get('/api/photos', async (req, res) => {
         
         // Paginate results
         const paginatedPhotos = allPhotos.slice(offset, offset + limit);
+        
+        console.log(`Returning ${paginatedPhotos.length} photos, total: ${allPhotos.length}, hasMore: ${offset + limit < allPhotos.length}`);
         
         res.json({
             photos: paginatedPhotos,
