@@ -319,7 +319,7 @@
             async init() {
                 await this.loadPhotos();
                 this.setupEventListeners();
-                this.showCurrentCard();
+                // showCurrentCard will be called after cards are created
             }
             
             async loadPhotos() {
@@ -345,6 +345,7 @@
                     }
                     
                     this.createCards();
+                    this.showCurrentCard();
                     this.hideLoading();
                     
                 } catch (error) {
@@ -364,6 +365,7 @@
                     { src: '/images/84190003.JPG', alt: 'Fallback 6' }
                 ];
                 this.createCards();
+                this.showCurrentCard();
                 this.hideLoading();
             }
             
@@ -404,22 +406,28 @@
             }
             
             showCurrentCard() {
+                console.log('Showing current card, index:', this.currentIndex);
                 const cards = this.cardDeck.querySelectorAll('.card');
+                console.log('Found cards:', cards.length);
                 
                 cards.forEach((card, index) => {
                     card.classList.remove('active', 'prev', 'next');
                     
                     if (index === this.currentIndex) {
                         card.classList.add('active');
+                        console.log('Set card', index, 'as active');
                     } else if (index === this.currentIndex - 1) {
                         card.classList.add('prev');
+                        console.log('Set card', index, 'as prev');
                     } else if (index === this.currentIndex + 1) {
                         card.classList.add('next');
+                        console.log('Set card', index, 'as next');
                     }
                 });
                 
                 this.currentIndexSpan.textContent = this.currentIndex + 1;
                 this.updateNavigation();
+                console.log('Current card shown successfully');
             }
             
             nextCard() {
