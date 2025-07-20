@@ -198,6 +198,21 @@
                     window.sdk.actions.ready();
                     console.log('✅ window.sdk.actions.ready() called');
                 }
+                // Method 5: Try Farcaster mini app specific methods
+                else if (window.farcaster && window.farcaster.actions && window.farcaster.actions.ready) {
+                    window.farcaster.actions.ready();
+                    console.log('✅ window.farcaster.actions.ready() called');
+                }
+                // Method 6: Try action.ready directly
+                else if (typeof action !== 'undefined' && action && action.ready) {
+                    action.ready();
+                    console.log('✅ action.ready() called');
+                }
+                // Method 7: Try window.action.ready
+                else if (window.action && window.action.ready) {
+                    window.action.ready();
+                    console.log('✅ window.action.ready() called');
+                }
                 else {
                     console.log('⚠️ No ready methods found, but continuing...');
                 }
@@ -419,6 +434,28 @@
                 callReady();
             }
         });
+
+        // Also call ready when window loads
+        window.addEventListener('load', () => {
+            console.log('🌐 Window loaded, calling ready()');
+            callReady();
+        });
+
+        // Multiple fallback timeouts to ensure ready is called
+        setTimeout(() => {
+            console.log('⏰ 500ms timeout: calling ready()');
+            callReady();
+        }, 500);
+
+        setTimeout(() => {
+            console.log('⏰ 2s timeout: calling ready()');
+            callReady();
+        }, 2000);
+
+        setTimeout(() => {
+            console.log('⏰ 5s timeout: calling ready()');
+            callReady();
+        }, 5000);
 
         // Keyboard controls
         document.addEventListener('keydown', (e) => {

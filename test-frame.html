@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Frame - Ready Function</title>
+    
+    <!-- Farcaster Frame Meta Tags -->
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="https://w.enlan.bo/frame-og.png" />
+    <meta property="fc:frame:button:1" content="Test Ready" />
+    <meta property="fc:frame:post_url" content="https://w.enlan.bo/api/frame-handler" />
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .status {
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .ready-status {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .error-status {
+            color: #f44336;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Frame - Ready Function</h1>
+    
+    <div class="status">
+        <div id="status">Initializing...</div>
+        <div id="ready-status" class="ready-status"></div>
+        <div id="error-status" class="error-status"></div>
+    </div>
+
+    <div class="status">
+        <h3>Available Objects:</h3>
+        <div id="objects"></div>
+    </div>
+
+    <script>
+        let readyCalled = false;
+        const statusEl = document.getElementById('status');
+        const readyStatusEl = document.getElementById('ready-status');
+        const errorStatusEl = document.getElementById('error-status');
+        const objectsEl = document.getElementById('objects');
+
+        function updateStatus(message) {
+            statusEl.textContent = message;
+            console.log(message);
+        }
+
+        function updateReadyStatus(message) {
+            readyStatusEl.textContent = message;
+            console.log('✅ ' + message);
+        }
+
+        function updateErrorStatus(message) {
+            errorStatusEl.textContent = message;
+            console.log('❌ ' + message);
+        }
+
+        function checkAvailableObjects() {
+            const objects = [];
+            
+            if (typeof ready === 'function') objects.push('global ready()');
+            if (window.farcaster) objects.push('window.farcaster');
+            if (window.farcaster && window.farcaster.ready) objects.push('window.farcaster.ready()');
+            if (window.farcaster && window.farcaster.actions) objects.push('window.farcaster.actions');
+            if (window.sdk) objects.push('window.sdk');
+            if (window.sdk && window.sdk.actions) objects.push('window.sdk.actions');
+            if (typeof action !== 'undefined') objects.push('global action');
+            if (window.action) objects.push('window.action');
+            
+            objectsEl.innerHTML = objects.map(obj => `<div>• ${obj}</div>`).join('');
+            return objects;
+        }
+
+        function callReady() {
+            if (readyCalled) return;
+            
+            updateStatus('🚀 Attempting to call ready()...');
+            
+            try {
+                // Method 1: Try global ready function
+                if (typeof ready === 'function') {
+                    ready();
+                    updateReadyStatus('Global ready() function called successfully');
+                    readyCalled = true;
+                    return;
+                }
+                
+                // Method 2: Try window.farcaster.ready
+                if (window.farcaster && window.farcaster.ready) {
+                    window.farcaster.ready();
+                    updateReadyStatus('window.farcaster.ready() called successfully');
+                    readyCalled = true;
+                    return;
+                }
+                
+                // Method 3: Try window.farcaster.actions.ready
+                if (window.farcaster && window.farcaster.actions && window.farcaster.actions.ready) {
+                    window.farcaster.actions.ready();
+                    updateReadyStatus('window.farcaster.actions.ready() called successfully');
+                    readyCalled = true;
+                    return;
+                }
+                
+                // Method 4: Try sdk.actions.ready
+                if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
+                    window.sdk.actions.ready();
+                    updateReadyStatus('window.sdk.actions.ready() called successfully');
+                    readyCalled = true;
+                    return;
+                }
+                
+                // Method 5: Try action.ready directly
+                if (typeof action !== 'undefined' && action && action.ready) {
+                    action.ready();
+                    updateReadyStatus('action.ready() called successfully');
+                    readyCalled = true;
+                    return;
+                }
+                
+                // Method 6: Try window.action.ready
+                if (window.action && window.action.ready) {
+                    window.action.ready();
+                    updateReadyStatus('window.action.ready() called successfully');
+                    readyCalled = true;
+                    return;
+                }
+                
+                // Method 7: Try postMessage
+                if (window.parent && window.parent.postMessage) {
+                    window.parent.postMessage({ type: 'ready' }, '*');
+                    updateReadyStatus('postMessage ready sent to parent');
+                    readyCalled = true;
+                    return;
+                }
+                
+                updateErrorStatus('No ready methods found');
+                
+            } catch (error) {
+                updateErrorStatus(`Error calling ready(): ${error.message}`);
+                readyCalled = true; // Prevent infinite retries
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus('DOM loaded, checking available objects...');
+            checkAvailableObjects();
+            
+            // Call ready immediately
+            callReady();
+            
+            // Call ready after a short delay
+            setTimeout(() => {
+                updateStatus('500ms timeout: calling ready()...');
+                callReady();
+            }, 500);
+            
+            // Call ready after 1 second
+            setTimeout(() => {
+                updateStatus('1s timeout: calling ready()...');
+                callReady();
+            }, 1000);
+            
+            // Call ready after 2 seconds
+            setTimeout(() => {
+                updateStatus('2s timeout: calling ready()...');
+                callReady();
+            }, 2000);
+        });
+
+        // Also call ready when window loads
+        window.addEventListener('load', () => {
+            updateStatus('Window loaded, calling ready()...');
+            callReady();
+        });
+    </script>
+</body>
+</html> 

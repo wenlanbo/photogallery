@@ -27,7 +27,7 @@ export default function handler(req, res) {
     <meta property="fc:frame" content="vNext" />
     <meta property="fc:frame:image" content="${baseUrl}/frame-og.png" />
     <meta property="fc:frame:button:1" content="View Slideshow" />
-    <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+    <meta property="fc:frame:post_url" content="${baseUrl}/api/frame-handler" />
     
     <style>
         * {
@@ -197,7 +197,7 @@ export default function handler(req, res) {
                 if (!response.ok) {
                     throw new Error(\`API failed: \${response.status}\`);
                 }
-                await sdk.actions.ready();
+                
                 const data = await response.json();
                 const apiImages = data.photos || [];
                 
@@ -354,18 +354,121 @@ export default function handler(req, res) {
             document.getElementById('loading').style.display = 'none';
         }
 
+        // Farcaster Frame ready() call
+        let readyCalled = false;
+
+        function callReady() {
+            if (readyCalled) return;
+            
+            console.log('🚀 Calling ready() to remove splash screen...');
+            
+            try {
+                // Method 1: Try global ready function (primary method)
+                if (typeof ready === 'function') {
+                    ready();
+                    console.log('✅ Global ready() function called');
+                }
+                // Method 2: Try window.farcaster.ready
+                else if (window.farcaster && window.farcaster.ready) {
+                    window.farcaster.ready();
+                    console.log('✅ window.farcaster.ready() called');
+                }
+                // Method 3: Try postMessage to parent
+                else if (window.parent && window.parent.postMessage) {
+                    window.parent.postMessage({ type: 'ready' }, '*');
+                    console.log('✅ postMessage ready sent to parent');
+                }
+                // Method 4: Try sdk.actions.ready if available
+                else if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
+                    window.sdk.actions.ready();
+                    console.log('✅ window.sdk.actions.ready() called');
+                }
+                // Method 5: Try Farcaster mini app specific methods
+                else if (window.farcaster && window.farcaster.actions && window.farcaster.actions.ready) {
+                    window.farcaster.actions.ready();
+                    console.log('✅ window.farcaster.actions.ready() called');
+                }
+                // Method 6: Try action.ready directly
+                else if (typeof action !== 'undefined' && action && action.ready) {
+                    action.ready();
+                    console.log('✅ action.ready() called');
+                }
+                // Method 7: Try window.action.ready
+                else if (window.action && window.action.ready) {
+                    window.action.ready();
+                    console.log('✅ window.action.ready() called');
+                }
+                else {
+                    console.log('⚠️ No ready methods found, but continuing...');
+                }
+                
+                readyCalled = true;
+                console.log('🎉 Ready called - splash screen should be removed');
+                
+            } catch (error) {
+                console.error('❌ Error calling ready():', error);
+                readyCalled = true; // Prevent infinite retries
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             updateStatus('Frame loaded, initializing...');
-            await loadImagesFromAPI();
-            createSlides();
-            createControls();
-            showSlide(0);
-            hideLoading();
             
-            // Start auto-play immediately
-            startAutoPlay();
+            // Call ready() immediately when page loads
+            console.log('🎯 Calling ready() immediately on page load');
+            callReady();
+            
+            try {
+                await loadImagesFromAPI();
+                createSlides();
+                createControls();
+                showSlide(0);
+                hideLoading();
+                
+                // Start auto-play immediately
+                startAutoPlay();
+                
+                // Call ready() again after everything is loaded
+                console.log('🎯 Calling ready() again after slideshow is ready');
+                callReady();
+                
+                // Fallback: call ready after 1 second if not called yet
+                setTimeout(() => {
+                    if (!readyCalled) {
+                        console.log('⏰ Fallback: calling ready() after timeout');
+                        callReady();
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ Initialization error:', error);
+                // Still try to call ready() even if there's an error
+                callReady();
+            }
         });
+
+        // Also call ready when window loads
+        window.addEventListener('load', () => {
+            console.log('🌐 Window loaded, calling ready()');
+            callReady();
+        });
+
+        // Multiple fallback timeouts to ensure ready is called
+        setTimeout(() => {
+            console.log('⏰ 500ms timeout: calling ready()');
+            callReady();
+        }, 500);
+
+        setTimeout(() => {
+            console.log('⏰ 2s timeout: calling ready()');
+            callReady();
+        }, 2000);
+
+        setTimeout(() => {
+            console.log('⏰ 5s timeout: calling ready()');
+            callReady();
+        }, 5000);
 
         // Keyboard controls
         document.addEventListener('keydown', (e) => {

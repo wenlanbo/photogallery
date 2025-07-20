@@ -10,6 +10,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/frame-handler.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "index.html",
       "use": "@vercel/static"
     },
@@ -27,6 +31,10 @@
     },
     {
       "src": "frame.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "test-frame.html",
       "use": "@vercel/static"
     },
     {
@@ -60,6 +68,10 @@
       "dest": "/api/frame.js"
     },
     {
+      "src": "/api/frame-handler",
+      "dest": "/api/frame-handler.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/server.js"
     },
@@ -78,6 +90,10 @@
     {
       "src": "/frame",
       "dest": "/frame.html"
+    },
+    {
+      "src": "/test-frame",
+      "dest": "/test-frame.html"
     },
     {
       "src": "/images/(.*)",
