@@ -517,7 +517,17 @@
                 return true;
             }
             
-            // Method 1: Try loading as script tag from jsDelivr
+            // Method 1: Try local import if package is installed
+            try {
+                const { sdk } = await import('./node_modules/@farcaster/miniapp-sdk/dist/index.js');
+                window.farcasterSDK = sdk;
+                console.log('✅ Farcaster SDK loaded from local node_modules:', window.farcasterSDK);
+                return true;
+            } catch (error) {
+                console.log('⚠️ Local import failed:', error.message);
+            }
+            
+            // Method 2: Try loading as script tag from jsDelivr
             return new Promise((resolve) => {
                 const script = document.createElement('script');
                 script.src = 'https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@latest/dist/index.js';
@@ -538,7 +548,7 @@
                 script.onerror = function() {
                     console.log('⚠️ Script tag loading failed, trying alternative...');
                     
-                    // Method 2: Try loading from unpkg as fallback
+                    // Method 3: Try loading from unpkg as fallback
                     const script2 = document.createElement('script');
                     script2.src = 'https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/index.js';
                     script2.onload = function() {
