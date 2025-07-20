@@ -8,34 +8,7 @@
     <!-- Farcaster Mini App Meta Tags -->
     <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://w.enlan.bo/frame-og.png","button":{"title":"View Slideshow","action":{"type":"launch_frame","name":"New Day One","url":"https://w.enlan.bo/frame","splashImageUrl":"https://w.enlan.bo/app-icon.png","splashBackgroundColor":"#FFFFFF"}}}' />
     
-    <!-- Farcaster Mini App SDK -->
-    <script>
-        // Try to load the SDK
-        (async function() {
-            try {
-                // Method 1: Try ES6 module import
-                const { sdk } = await import('https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/index.js');
-                window.farcasterSDK = sdk;
-                console.log('✅ Farcaster SDK imported successfully via ES6:', sdk);
-            } catch (error) {
-                console.log('⚠️ ES6 import failed, trying alternative methods...');
-                
-                // Method 2: Try loading as script tag
-                const script = document.createElement('script');
-                script.src = 'https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/index.js';
-                script.onload = function() {
-                    if (window.FarcasterSDK) {
-                        window.farcasterSDK = window.FarcasterSDK;
-                        console.log('✅ Farcaster SDK loaded via script tag:', window.farcasterSDK);
-                    }
-                };
-                script.onerror = function() {
-                    console.log('⚠️ Script tag loading also failed');
-                };
-                document.head.appendChild(script);
-            }
-        })();
-    </script>
+    <!-- Farcaster Mini App SDK will be loaded in DOMContentLoaded -->
     
     <style>
         * {
@@ -294,6 +267,13 @@
                     readyCalled = true;
                     return true;
                 }
+                // Fallback: Check for any ready function in the global scope
+                else if (typeof ready === 'function') {
+                    ready();
+                    console.log('✅ Global ready() function called successfully');
+                    readyCalled = true;
+                    return true;
+                }
                 // Fallback: postMessage to parent
                 else if (window.parent && window.parent.postMessage) {
                     window.parent.postMessage({ type: 'ready' }, '*');
@@ -507,12 +487,59 @@
             document.getElementById('loading').style.display = 'none';
         }
 
+        // Load Farcaster SDK
+        async function loadFarcasterSDK() {
+            console.log('🔄 Loading Farcaster SDK...');
+            
+            // Check if SDK is already available (injected by Mini App environment)
+            if (window.sdk && window.sdk.actions) {
+                window.farcasterSDK = window.sdk;
+                console.log('✅ Farcaster SDK already available from Mini App environment:', window.farcasterSDK);
+                return true;
+            }
+            
+            try {
+                // Method 1: Try ES6 module import from jsDelivr (more reliable)
+                const { sdk } = await import('https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@latest/dist/index.js');
+                window.farcasterSDK = sdk;
+                console.log('✅ Farcaster SDK imported successfully via ES6:', sdk);
+                return true;
+            } catch (error) {
+                console.log('⚠️ ES6 import failed:', error.message);
+                
+                // Method 2: Try loading as script tag from jsDelivr
+                return new Promise((resolve) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@latest/dist/index.js';
+                    script.onload = function() {
+                        if (window.FarcasterSDK) {
+                            window.farcasterSDK = window.FarcasterSDK;
+                            console.log('✅ Farcaster SDK loaded via script tag:', window.farcasterSDK);
+                            resolve(true);
+                        } else if (window.sdk) {
+                            window.farcasterSDK = window.sdk;
+                            console.log('✅ Farcaster SDK found as window.sdk:', window.farcasterSDK);
+                            resolve(true);
+                        } else {
+                            console.log('⚠️ Script loaded but SDK not found');
+                            resolve(false);
+                        }
+                    };
+                    script.onerror = function() {
+                        console.log('⚠️ Script tag loading failed');
+                        resolve(false);
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+        }
+
         // Initialize Mini App
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 Mini App loaded, initializing...');
             
-            // Wait a bit for SDK to load
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Try to load the SDK first
+            await loadFarcasterSDK();
             
             // Debug the environment first
             debugEnvironment();
