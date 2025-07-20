@@ -6,6 +6,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/frame.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "index.html",
       "use": "@vercel/static"
     },
@@ -22,6 +26,14 @@
       "use": "@vercel/static"
     },
     {
+      "src": "frame.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "frame-og.png",
+      "use": "@vercel/static"
+    },
+    {
       "src": "icons/**",
       "use": "@vercel/static"
     },
@@ -31,6 +43,10 @@
     }
   ],
   "routes": [
+    {
+      "src": "/api/frame",
+      "dest": "/api/frame.js"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/server.js"
@@ -42,6 +58,10 @@
     {
       "src": "/new-day-one",
       "dest": "/new-day-one.html"
+    },
+    {
+      "src": "/frame",
+      "dest": "/frame.html"
     },
     {
       "src": "/images/(.*)",
