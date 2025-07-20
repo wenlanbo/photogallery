@@ -136,6 +136,7 @@ body {
     padding: 1rem 2rem;
     border-radius: 50px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: none; /* Hidden by default, shown when photos load */
 }
 
 .nav-btn {

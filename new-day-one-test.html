@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Day One - Test</title>
+    <link rel="stylesheet" href="new-day-one.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="title">New Day One</h1>
+            <p class="subtitle">A Film Experience - Test Version</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="card-deck" id="cardDeck">
+                <!-- Test cards will be created here -->
+            </div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading Test Photos...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Navigation controls -->
+    <div class="navigation" id="navigation">
+        <button class="nav-btn prev-btn" id="prevBtn">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="counter" id="counter">
+            <span id="currentIndex">1</span> / <span id="totalCount">0</span>
+        </div>
+        <button class="nav-btn next-btn" id="nextBtn">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- Back to main gallery -->
+    <div class="back-link">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Gallery</span>
+        </a>
+    </div>
+
+    <script>
+        // Simple test version
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Test page loaded');
+            
+            const cardDeck = document.getElementById('cardDeck');
+            const loading = document.getElementById('loading');
+            const navigation = document.getElementById('navigation');
+            const totalCount = document.getElementById('totalCount');
+            
+            // Test photos
+            const testPhotos = [
+                '/images/724-10.JPG',
+                '/images/724-56.JPG',
+                '/images/724-62.JPG',
+                '/images/724-70.JPG',
+                '/images/84190002.JPG',
+                '/images/84190003.JPG'
+            ];
+            
+            console.log('Creating test cards for', testPhotos.length, 'photos');
+            
+            // Create cards
+            testPhotos.forEach((src, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                if (index === 0) card.classList.add('active', 'cover-card');
+                else if (index === 1) card.classList.add('next');
+                
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `Test Photo ${index + 1}`;
+                
+                card.appendChild(img);
+                cardDeck.appendChild(card);
+                
+                console.log(`Created card ${index + 1}:`, src);
+            });
+            
+            // Hide loading, show navigation
+            loading.style.display = 'none';
+            navigation.style.display = 'flex';
+            totalCount.textContent = testPhotos.length;
+            
+            console.log('Test setup complete');
+        });
+    </script>
+</body>
+</html> 

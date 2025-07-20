@@ -18,6 +18,9 @@ class CardDeckExperience {
     }
     
     async init() {
+        console.log('Initializing New Day One experience...');
+        
+        // Try to load photos from API first
         await this.loadPhotos();
         this.setupEventListeners();
         this.updateNavigation();
@@ -26,17 +29,25 @@ class CardDeckExperience {
     
     async loadPhotos() {
         try {
+            console.log('Attempting to load photos from API...');
+            
             // Load photos from the /new-day-one folder in Vercel Blob
             const response = await fetch('/api/photos?folder=new-day-one');
+            console.log('API Response status:', response.status);
+            
             if (!response.ok) {
-                throw new Error('Failed to load photos');
+                throw new Error(`Failed to load photos: ${response.status}`);
             }
             
             const data = await response.json();
+            console.log('API Response data:', data);
+            
             this.photos = data.photos || [];
+            console.log('Photos loaded:', this.photos.length);
             
             // If no photos found, show a message
             if (this.photos.length === 0) {
+                console.log('No photos found, showing message...');
                 this.showNoPhotosMessage();
                 return;
             }
@@ -46,6 +57,7 @@ class CardDeckExperience {
             
         } catch (error) {
             console.error('Error loading photos:', error);
+            console.log('Falling back to local images...');
             // Fallback to local images if API fails
             this.loadFallbackPhotos();
         }
@@ -64,11 +76,13 @@ class CardDeckExperience {
             { src: '/images/84190003.JPG', alt: 'New Day One - 6' }
         ];
         
+        console.log('Fallback photos set:', this.photos.length);
         this.createCards();
         this.hideLoading();
     }
     
     createCards() {
+        console.log('Creating cards for', this.photos.length, 'photos');
         this.cardDeck.innerHTML = '';
         
         this.photos.forEach((photo, index) => {
@@ -86,11 +100,14 @@ class CardDeckExperience {
             img.alt = photo.alt || `Photo ${index + 1}`;
             img.loading = 'lazy';
             
+            console.log(`Creating card ${index + 1}:`, img.src);
+            
             card.appendChild(img);
             this.cardDeck.appendChild(card);
         });
         
         this.totalCountSpan.textContent = this.photos.length;
+        console.log('Cards created, total count:', this.photos.length);
     }
     
     showCurrentCard() {
@@ -190,6 +207,7 @@ class CardDeckExperience {
     }
     
     hideLoading() {
+        console.log('Hiding loading, showing navigation');
         this.loading.style.display = 'none';
         this.navigation.style.display = 'flex';
     }
