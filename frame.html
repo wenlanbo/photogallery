@@ -178,21 +178,33 @@
         
         async function initializeFarcasterFrame() {
             try {
-                // Check if we're in a Farcaster Frame environment
-                if (typeof Frame !== 'undefined') {
-                    // Initialize the Farcaster Frame SDK
-                    sdk = new Frame({
-                        frameUrl: window.location.href,
-                        frameData: {
-                            fid: 302199, // Your FID
-                            network: 1, // Mainnet
-                        },
-                    });
+                // Wait for the SDK to be available
+                await new Promise(resolve => {
+                    if (typeof Frame !== 'undefined') {
+                        resolve();
+                    } else {
+                        // Wait for SDK to load
+                        const checkSDK = () => {
+                            if (typeof Frame !== 'undefined') {
+                                resolve();
+                            } else {
+                                setTimeout(checkSDK, 100);
+                            }
+                        };
+                        checkSDK();
+                    }
+                });
 
-                    console.log('Farcaster Frame SDK initialized');
-                } else {
-                    console.log('Not in Farcaster Frame environment');
-                }
+                // Initialize the Farcaster Frame SDK
+                sdk = new Frame({
+                    frameUrl: window.location.href,
+                    frameData: {
+                        fid: 302199, // Your FID
+                        network: 1, // Mainnet
+                    },
+                });
+
+                console.log('Farcaster Frame SDK initialized successfully');
                 
             } catch (error) {
                 console.error('Error initializing Farcaster Frame:', error);
@@ -203,20 +215,35 @@
             if (sdkReadyCalled) return;
             
             try {
-                if (sdk && typeof sdk.actions !== 'undefined' && typeof sdk.actions.ready === 'function') {
+                console.log('Attempting to call sdk.actions.ready()...');
+                
+                // Try multiple methods to call ready()
+                if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+                    console.log('Using sdk.actions.ready()');
                     await sdk.actions.ready();
-                    console.log('Farcaster Frame ready - splash screen removed');
+                    console.log('✅ sdk.actions.ready() called successfully');
+                } else if (window.farcaster && window.farcaster.ready) {
+                    console.log('Using window.farcaster.ready()');
+                    await window.farcaster.ready();
+                    console.log('✅ window.farcaster.ready() called successfully');
+                } else if (window.parent && window.parent.postMessage) {
+                    console.log('Using postMessage to parent');
+                    window.parent.postMessage({ type: 'ready' }, '*');
+                    console.log('✅ postMessage ready sent');
                 } else {
-                    console.log('SDK not available, trying alternative method');
-                    // Try alternative method if SDK is not available
-                    if (window.farcaster && window.farcaster.ready) {
-                        await window.farcaster.ready();
-                        console.log('Alternative Farcaster ready method called');
+                    console.log('No SDK methods available, trying direct call');
+                    // Try to call ready directly if available
+                    if (typeof ready === 'function') {
+                        await ready();
+                        console.log('✅ Direct ready() called');
                     }
                 }
+                
                 sdkReadyCalled = true;
+                console.log('🎉 Splash screen should be removed');
+                
             } catch (error) {
-                console.error('Error calling sdk.actions.ready():', error);
+                console.error('❌ Error calling ready():', error);
                 sdkReadyCalled = true; // Prevent infinite retries
             }
         }
@@ -423,7 +450,7 @@
                     updateStatus('Fallback: calling sdk.actions.ready() after timeout');
                     callSdkReady();
                 }
-            }, 3000);
+            }, 2000);
         });
 
         // Keyboard controls
