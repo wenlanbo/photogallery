@@ -87,9 +87,9 @@
         .slide img {
             max-width: 100%;
             max-height: 100%;
-            object-fit: cover;
-            width: 100%;
-            height: 100%;
+            object-fit: contain;
+            width: auto;
+            height: auto;
         }
 
         .controls {
@@ -161,19 +161,7 @@
             color: #666;
         }
 
-        .status {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-family: monospace;
-            max-width: 300px;
-            z-index: 1000;
-        }
+
 
         .footer {
             background: #fafafa;
@@ -211,7 +199,7 @@
         </a>
     </div>
 
-    <div class="status" id="status">Loading...</div>
+
 
     <!-- Footer with copyright -->
     <footer class="footer">
@@ -270,7 +258,6 @@
         let slides = [];
 
         function updateStatus(message) {
-            document.getElementById('status').textContent = message;
             console.log('Status:', message);
         }
 
