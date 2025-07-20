@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Day One - Working Version</title>
+    <title>New Day One - Test Simple</title>
     <link rel="icon" type="image/png" href="icons/wenlanbo.png">
     <link rel="shortcut icon" type="image/png" href="icons/wenlanbo.png">
     <link rel="apple-touch-icon" href="icons/wenlanbo.png">
@@ -247,7 +247,7 @@
     <header class="header">
         <div class="container">
             <h1 class="title">New Day One</h1>
-            <p class="subtitle">A Film Experience - Working Version</p>
+            <p class="subtitle">Test Simple - Local Images Only</p>
         </div>
     </header>
 
@@ -258,7 +258,7 @@
             </div>
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>Loading Film Experience...</p>
+                <p>Loading Test Slideshow...</p>
             </div>
         </div>
     </main>
@@ -295,12 +295,11 @@
     </footer>
 
     <script>
-        class WorkingCardDeck {
+        class TestSlideshow {
             constructor() {
                 this.currentIndex = 0;
-                this.photos = [];
                 this.autoPlayInterval = null;
-                this.autoPlayDelay = 3000; // 3 seconds between slides
+                this.autoPlayDelay = 3000;
                 
                 // DOM elements
                 this.cardDeck = document.getElementById('cardDeck');
@@ -313,62 +312,34 @@
                 this.currentIndexSpan = document.getElementById('currentIndex');
                 this.totalCountSpan = document.getElementById('totalCount');
                 
+                // Use only local images for testing
+                this.photos = [
+                    { src: '/images/724-10.JPG', alt: 'Test Photo 1' },
+                    { src: '/images/724-56.JPG', alt: 'Test Photo 2' },
+                    { src: '/images/724-62.JPG', alt: 'Test Photo 3' },
+                    { src: '/images/724-70.JPG', alt: 'Test Photo 4' },
+                    { src: '/images/84190002.JPG', alt: 'Test Photo 5' },
+                    { src: '/images/84190003.JPG', alt: 'Test Photo 6' }
+                ];
+                
                 this.init();
             }
             
-            async init() {
-                await this.loadPhotos();
+            init() {
+                console.log('Initializing test slideshow with', this.photos.length, 'photos');
+                this.createCards();
                 this.setupEventListeners();
                 this.showCurrentCard();
-            }
-            
-            async loadPhotos() {
-                try {
-                    console.log('Loading photos from API...');
-                    const response = await fetch('/api/photos?folder=new-day-one&limit=100');
-                    console.log('API Response status:', response.status);
-                    
-                    if (!response.ok) {
-                        throw new Error(`API failed: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    console.log('API Response data:', data);
-                    
-                    this.photos = data.photos || [];
-                    console.log('Photos loaded from API:', this.photos.length);
-                    
-                    if (this.photos.length === 0) {
-                        console.log('No photos from API, using fallback...');
-                        this.loadFallbackPhotos();
-                        return;
-                    }
-                    
-                    this.createCards();
-                    this.hideLoading();
-                    
-                } catch (error) {
-                    console.error('Error loading photos from API:', error);
-                    console.log('Falling back to local images...');
-                    this.loadFallbackPhotos();
-                }
-            }
-            
-            loadFallbackPhotos() {
-                this.photos = [
-                    { src: '/images/724-10.JPG', alt: 'Fallback 1' },
-                    { src: '/images/724-56.JPG', alt: 'Fallback 2' },
-                    { src: '/images/724-62.JPG', alt: 'Fallback 3' },
-                    { src: '/images/724-70.JPG', alt: 'Fallback 4' },
-                    { src: '/images/84190002.JPG', alt: 'Fallback 5' },
-                    { src: '/images/84190003.JPG', alt: 'Fallback 6' }
-                ];
-                this.createCards();
                 this.hideLoading();
+                
+                // Start auto-play after 2 seconds
+                setTimeout(() => {
+                    this.startAutoPlay();
+                }, 2000);
             }
             
             createCards() {
-                console.log('Creating cards for', this.photos.length, 'photos');
+                console.log('Creating cards...');
                 this.cardDeck.innerHTML = '';
                 
                 this.photos.forEach((photo, index) => {
@@ -377,30 +348,26 @@
                     card.dataset.index = index;
                     
                     const img = document.createElement('img');
-                    const imageSrc = photo.src || photo.url;
-                    img.src = imageSrc;
-                    img.alt = photo.alt || `Photo ${index + 1}`;
+                    img.src = photo.src;
+                    img.alt = photo.alt;
                     img.loading = 'lazy';
                     
-                    // Add error handling for images
                     img.onerror = () => {
-                        console.error(`Failed to load image: ${imageSrc}`);
-                        img.src = '/images/724-10.JPG'; // Fallback image
+                        console.error(`Failed to load image: ${photo.src}`);
                     };
                     
-                    // Add success handler
                     img.onload = () => {
-                        console.log(`Image loaded successfully: ${imageSrc}`);
+                        console.log(`Image loaded: ${photo.src}`);
                     };
                     
                     card.appendChild(img);
                     this.cardDeck.appendChild(card);
                     
-                    console.log(`Created card ${index + 1}:`, imageSrc);
+                    console.log(`Created card ${index + 1}:`, photo.src);
                 });
                 
                 this.totalCountSpan.textContent = this.photos.length;
-                console.log('Cards created, total count:', this.photos.length);
+                console.log('Cards created successfully');
             }
             
             showCurrentCard() {
@@ -424,7 +391,6 @@
             
             nextCard() {
                 this.currentIndex++;
-                // Circulate to the beginning when reaching the end
                 if (this.currentIndex >= this.photos.length) {
                     this.currentIndex = 0;
                 }
@@ -433,7 +399,6 @@
             
             prevCard() {
                 this.currentIndex--;
-                // Circulate to the end when going before the beginning
                 if (this.currentIndex < 0) {
                     this.currentIndex = this.photos.length - 1;
                 }
@@ -441,7 +406,6 @@
             }
             
             updateNavigation() {
-                // Always enable navigation since we're circulating
                 this.prevBtn.disabled = false;
                 this.nextBtn.disabled = false;
             }
@@ -471,7 +435,7 @@
                             this.stopAutoPlay();
                             this.nextCard();
                             break;
-                        case ' ': // Spacebar
+                        case ' ':
                             e.preventDefault();
                             this.toggleAutoPlay();
                             break;
@@ -484,19 +448,15 @@
                         this.nextCard();
                     }
                 });
-                
-                // Start auto-play after a short delay
-                setTimeout(() => {
-                    this.startAutoPlay();
-                }, 2000);
             }
             
             startAutoPlay() {
-                this.stopAutoPlay(); // Clear any existing interval
+                this.stopAutoPlay();
                 this.autoPlayInterval = setInterval(() => {
                     this.nextCard();
                 }, this.autoPlayDelay);
                 this.playIcon.className = 'fas fa-pause';
+                console.log('Auto-play started');
             }
             
             stopAutoPlay() {
@@ -505,15 +465,14 @@
                     this.autoPlayInterval = null;
                 }
                 this.playIcon.className = 'fas fa-play';
+                console.log('Auto-play stopped');
             }
             
             toggleAutoPlay() {
                 if (this.autoPlayInterval) {
                     this.stopAutoPlay();
-                    this.playIcon.className = 'fas fa-play';
                 } else {
                     this.startAutoPlay();
-                    this.playIcon.className = 'fas fa-pause';
                 }
             }
             
@@ -525,7 +484,8 @@
         
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            new WorkingCardDeck();
+            console.log('Page loaded, starting test slideshow...');
+            new TestSlideshow();
         });
     </script>
 </body>

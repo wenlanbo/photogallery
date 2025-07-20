@@ -50,6 +50,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "new-day-one-test-simple.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "icons/**",
       "use": "@vercel/static"
     },
@@ -90,6 +94,10 @@
     {
       "src": "/new-day-one-working",
       "dest": "/new-day-one-working.html"
+    },
+    {
+      "src": "/new-day-one-test-simple",
+      "dest": "/new-day-one-test-simple.html"
     },
     {
       "src": "/icons/(.*)",
