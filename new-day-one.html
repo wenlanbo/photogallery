@@ -208,7 +208,6 @@
     <div class="back-link">
         <a href="index.html" class="back-btn">
             <i class="fas fa-arrow-left"></i>
-            <span>Back to Gallery</span>
         </a>
     </div>
 
@@ -222,15 +221,49 @@
     </footer>
 
     <script>
-        // Simple slideshow with guaranteed working images
-        const images = [
-            'https://picsum.photos/800/600?random=1',
-            'https://picsum.photos/800/600?random=2',
-            'https://picsum.photos/800/600?random=3',
-            'https://picsum.photos/800/600?random=4',
-            'https://picsum.photos/800/600?random=5',
-            'https://picsum.photos/800/600?random=6'
-        ];
+        // Slideshow with images from Vercel Blob
+        let images = [];
+        async function loadImagesFromAPI() {
+            try {
+                updateStatus('Loading images from API...');
+                const response = await fetch('/api/photos?folder=new-day-one&limit=100');
+                
+                if (!response.ok) {
+                    throw new Error(`API failed: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const apiImages = data.photos || [];
+                
+                if (apiImages.length > 0) {
+                    images = apiImages.map(photo => photo.src || photo.url);
+                    updateStatus(`Loaded ${images.length} images from API`);
+                } else {
+                    // Fallback to placeholder images if no API images
+                    images = [
+                        'https://picsum.photos/800/600?random=1',
+                        'https://picsum.photos/800/600?random=2',
+                        'https://picsum.photos/800/600?random=3',
+                        'https://picsum.photos/800/600?random=4',
+                        'https://picsum.photos/800/600?random=5',
+                        'https://picsum.photos/800/600?random=6'
+                    ];
+                    updateStatus('No API images, using placeholders');
+                }
+            } catch (error) {
+                console.error('Error loading from API:', error);
+                // Fallback to placeholder images
+                images = [
+                    'https://picsum.photos/800/600?random=1',
+                    'https://picsum.photos/800/600?random=2',
+                    'https://picsum.photos/800/600?random=3',
+                    'https://picsum.photos/800/600?random=4',
+                    'https://picsum.photos/800/600?random=5',
+                    'https://picsum.photos/800/600?random=6'
+                ];
+                updateStatus('API failed, using placeholders');
+            }
+        }
 
         let currentSlide = 0;
         let autoPlayInterval = null;
@@ -376,8 +409,9 @@
         }
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             updateStatus('Page loaded, initializing...');
+            await loadImagesFromAPI();
             createSlides();
             createControls();
             showSlide(0);
