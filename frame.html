@@ -281,9 +281,28 @@
                     readyCalled = true;
                     return true;
                 }
-                // Last resort: call ready() anyway to prevent splash screen from persisting
+                // Last resort: Create a mock SDK and call ready() anyway
                 else {
-                    console.log('⚠️ No ready methods available, calling ready() anyway to prevent splash screen persistence');
+                    console.log('⚠️ No ready methods available, creating mock SDK and calling ready()');
+                    
+                    // Create a mock SDK to satisfy the Mini App environment
+                    if (!window.sdk) {
+                        window.sdk = {
+                            actions: {
+                                ready: async function() {
+                                    console.log('✅ Mock SDK ready() called');
+                                    return Promise.resolve();
+                                }
+                            }
+                        };
+                    }
+                    
+                    // Call the mock ready function
+                    if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
+                        await window.sdk.actions.ready();
+                        console.log('✅ Mock SDK ready() called successfully');
+                    }
+                    
                     readyCalled = true;
                     return true;
                 }
@@ -498,40 +517,52 @@
                 return true;
             }
             
-            try {
-                // Method 1: Try ES6 module import from jsDelivr (more reliable)
-                const { sdk } = await import('https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@latest/dist/index.js');
-                window.farcasterSDK = sdk;
-                console.log('✅ Farcaster SDK imported successfully via ES6:', sdk);
-                return true;
-            } catch (error) {
-                console.log('⚠️ ES6 import failed:', error.message);
-                
-                // Method 2: Try loading as script tag from jsDelivr
-                return new Promise((resolve) => {
-                    const script = document.createElement('script');
-                    script.src = 'https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@latest/dist/index.js';
-                    script.onload = function() {
+            // Method 1: Try loading as script tag from jsDelivr
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@latest/dist/index.js';
+                script.onload = function() {
+                    if (window.FarcasterSDK) {
+                        window.farcasterSDK = window.FarcasterSDK;
+                        console.log('✅ Farcaster SDK loaded via script tag:', window.farcasterSDK);
+                        resolve(true);
+                    } else if (window.sdk) {
+                        window.farcasterSDK = window.sdk;
+                        console.log('✅ Farcaster SDK found as window.sdk:', window.farcasterSDK);
+                        resolve(true);
+                    } else {
+                        console.log('⚠️ Script loaded but SDK not found');
+                        resolve(false);
+                    }
+                };
+                script.onerror = function() {
+                    console.log('⚠️ Script tag loading failed, trying alternative...');
+                    
+                    // Method 2: Try loading from unpkg as fallback
+                    const script2 = document.createElement('script');
+                    script2.src = 'https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/index.js';
+                    script2.onload = function() {
                         if (window.FarcasterSDK) {
                             window.farcasterSDK = window.FarcasterSDK;
-                            console.log('✅ Farcaster SDK loaded via script tag:', window.farcasterSDK);
+                            console.log('✅ Farcaster SDK loaded via unpkg fallback:', window.farcasterSDK);
                             resolve(true);
                         } else if (window.sdk) {
                             window.farcasterSDK = window.sdk;
-                            console.log('✅ Farcaster SDK found as window.sdk:', window.farcasterSDK);
+                            console.log('✅ Farcaster SDK found as window.sdk via unpkg:', window.farcasterSDK);
                             resolve(true);
                         } else {
-                            console.log('⚠️ Script loaded but SDK not found');
+                            console.log('⚠️ Both CDN methods failed');
                             resolve(false);
                         }
                     };
-                    script.onerror = function() {
-                        console.log('⚠️ Script tag loading failed');
+                    script2.onerror = function() {
+                        console.log('⚠️ All SDK loading methods failed');
                         resolve(false);
                     };
-                    document.head.appendChild(script);
-                });
-            }
+                    document.head.appendChild(script2);
+                };
+                document.head.appendChild(script);
+            });
         }
 
         // Initialize Mini App
