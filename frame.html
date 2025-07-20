@@ -9,7 +9,7 @@
     <meta property="fc:frame" content="vNext" />
     <meta property="fc:frame:image" content="https://w.enlan.bo/frame-og.png" />
     <meta property="fc:frame:button:1" content="View Slideshow" />
-    <meta property="fc:frame:post_url" content="https://w.enlan.bo/api/frame" />
+    <meta property="fc:frame:post_url" content="https://w.enlan.bo/api/frame-handler" />
     
     <style>
         * {
@@ -169,8 +169,35 @@
     </div>
 
     <script>
-        // Simple Farcaster Frame ready() call
+        // Comprehensive Farcaster Frame ready() call with debugging
         let readyCalled = false;
+
+        function debugEnvironment() {
+            console.log('🔍 Debugging Farcaster environment...');
+            console.log('window.location:', window.location.href);
+            console.log('window.parent:', !!window.parent);
+            console.log('window.top:', !!window.top);
+            console.log('typeof ready:', typeof ready);
+            console.log('window.farcaster:', !!window.farcaster);
+            console.log('window.sdk:', !!window.sdk);
+            console.log('typeof action:', typeof action);
+            console.log('window.action:', !!window.action);
+            
+            if (window.farcaster) {
+                console.log('window.farcaster.ready:', !!window.farcaster.ready);
+                console.log('window.farcaster.actions:', !!window.farcaster.actions);
+                if (window.farcaster.actions) {
+                    console.log('window.farcaster.actions.ready:', !!window.farcaster.actions.ready);
+                }
+            }
+            
+            if (window.sdk) {
+                console.log('window.sdk.actions:', !!window.sdk.actions);
+                if (window.sdk.actions) {
+                    console.log('window.sdk.actions.ready:', !!window.sdk.actions.ready);
+                }
+            }
+        }
 
         function callReady() {
             if (readyCalled) return;
@@ -212,6 +239,19 @@
                 else if (window.action && window.action.ready) {
                     window.action.ready();
                     console.log('✅ window.action.ready() called');
+                }
+                // Method 8: Try Farcaster SDK v2 style
+                else if (window.Farcaster && window.Farcaster.ready) {
+                    window.Farcaster.ready();
+                    console.log('✅ window.Farcaster.ready() called');
+                }
+                // Method 9: Try direct postMessage with specific format
+                else if (window.parent && window.parent.postMessage) {
+                    window.parent.postMessage({ 
+                        type: 'farcaster:ready',
+                        data: { ready: true }
+                    }, '*');
+                    console.log('✅ Farcaster-specific postMessage sent');
                 }
                 else {
                     console.log('⚠️ No ready methods found, but continuing...');
@@ -400,6 +440,9 @@
         // Initialize everything
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 Frame loaded, initializing...');
+            
+            // Debug the environment first
+            debugEnvironment();
             
             // Call ready() immediately when page loads
             console.log('🎯 Calling ready() immediately on page load');

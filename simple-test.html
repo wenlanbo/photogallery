@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Action.ready Test</title>
+    
+    <!-- Farcaster Frame Meta Tags -->
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="https://w.enlan.bo/frame-og.png" />
+    <meta property="fc:frame:button:1" content="Test" />
+    <meta property="fc:frame:post_url" content="https://w.enlan.bo/api/frame-handler" />
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .log {
+            background: #333;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: left;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Action.ready Test</h1>
+    <div id="logs"></div>
+
+    <script>
+        const logs = document.getElementById('logs');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logs.appendChild(logEntry);
+            console.log(message);
+        }
+
+        log('Page loaded, checking for action.ready methods...');
+
+        // Check what's available
+        log(`typeof ready: ${typeof ready}`);
+        log(`window.farcaster: ${!!window.farcaster}`);
+        log(`window.sdk: ${!!window.sdk}`);
+        log(`typeof action: ${typeof action}`);
+        log(`window.action: ${!!window.action}`);
+
+        if (window.farcaster) {
+            log(`window.farcaster.ready: ${!!window.farcaster.ready}`);
+            log(`window.farcaster.actions: ${!!window.farcaster.actions}`);
+            if (window.farcaster.actions) {
+                log(`window.farcaster.actions.ready: ${!!window.farcaster.actions.ready}`);
+            }
+        }
+
+        if (window.sdk) {
+            log(`window.sdk.actions: ${!!window.sdk.actions}`);
+            if (window.sdk.actions) {
+                log(`window.sdk.actions.ready: ${!!window.sdk.actions.ready}`);
+            }
+        }
+
+        // Try to call ready
+        function tryReady() {
+            log('Attempting to call ready()...');
+            
+            try {
+                if (typeof ready === 'function') {
+                    ready();
+                    log('✅ Global ready() called successfully');
+                    return true;
+                }
+                
+                if (window.farcaster && window.farcaster.ready) {
+                    window.farcaster.ready();
+                    log('✅ window.farcaster.ready() called successfully');
+                    return true;
+                }
+                
+                if (window.farcaster && window.farcaster.actions && window.farcaster.actions.ready) {
+                    window.farcaster.actions.ready();
+                    log('✅ window.farcaster.actions.ready() called successfully');
+                    return true;
+                }
+                
+                if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
+                    window.sdk.actions.ready();
+                    log('✅ window.sdk.actions.ready() called successfully');
+                    return true;
+                }
+                
+                if (typeof action !== 'undefined' && action && action.ready) {
+                    action.ready();
+                    log('✅ action.ready() called successfully');
+                    return true;
+                }
+                
+                if (window.action && window.action.ready) {
+                    window.action.ready();
+                    log('✅ window.action.ready() called successfully');
+                    return true;
+                }
+                
+                log('❌ No ready methods found');
+                return false;
+                
+            } catch (error) {
+                log(`❌ Error calling ready: ${error.message}`);
+                return false;
+            }
+        }
+
+        // Call ready immediately
+        tryReady();
+
+        // Call ready after delays
+        setTimeout(() => {
+            log('500ms timeout - trying ready again...');
+            tryReady();
+        }, 500);
+
+        setTimeout(() => {
+            log('1s timeout - trying ready again...');
+            tryReady();
+        }, 1000);
+
+        setTimeout(() => {
+            log('2s timeout - trying ready again...');
+            tryReady();
+        }, 2000);
+    </script>
+</body>
+</html> 

@@ -38,6 +38,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "simple-test.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "frame-og.png",
       "use": "@vercel/static"
     },
@@ -94,6 +98,10 @@
     {
       "src": "/test-frame",
       "dest": "/test-frame.html"
+    },
+    {
+      "src": "/simple-test",
+      "dest": "/simple-test.html"
     },
     {
       "src": "/images/(.*)",
