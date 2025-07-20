@@ -66,6 +66,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "new-day-one-working-fixed.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "icons/**",
       "use": "@vercel/static"
     },
@@ -122,6 +126,14 @@
     {
       "src": "/test-images",
       "dest": "/test-images.html"
+    },
+    {
+      "src": "/new-day-one-working-fixed",
+      "dest": "/new-day-one-working-fixed.html"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/images/$1"
     },
     {
       "src": "/icons/(.*)",
