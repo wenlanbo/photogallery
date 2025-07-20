@@ -273,9 +273,40 @@
         </div>
     </footer>
 
-    <script type="module">
-        // Import Farcaster Mini App SDK from CDN
-        import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk';
+    <script>
+        // Load Farcaster Mini App SDK with fallback for Coinbase Wallet compatibility
+        let sdk = null;
+        
+        async function loadSDK() {
+            try {
+                // Try ES6 module import first (for Farcaster)
+                const module = await import('https://esm.sh/@farcaster/miniapp-sdk');
+                sdk = module.sdk;
+                log('✅ SDK loaded via ES6 module');
+                return true;
+            } catch (error) {
+                log(`⚠️ ES6 module import failed: ${error.message}`);
+                
+                // Fallback: Check for global SDK (Coinbase Wallet)
+                if (window.sdk) {
+                    sdk = window.sdk;
+                    log('✅ SDK loaded from global window.sdk');
+                    return true;
+                }
+                
+                // Final fallback: Create mock SDK
+                log('⚠️ Creating mock SDK for compatibility');
+                sdk = {
+                    actions: {
+                        ready: async () => {
+                            log('✅ Mock ready() called');
+                            return Promise.resolve();
+                        }
+                    }
+                };
+                return true;
+            }
+        }
 
         // Mobile-optimized slideshow
         let images = [];
@@ -296,13 +327,18 @@
             log('🚀 Calling ready() to remove splash screen...');
             
             try {
+                // Ensure SDK is loaded
+                if (!sdk) {
+                    await loadSDK();
+                }
+                
                 if (sdk && sdk.actions && sdk.actions.ready) {
                     await sdk.actions.ready();
                     log('✅ sdk.actions.ready() called successfully');
                     readyCalled = true;
                     return true;
                 } else {
-                    log('⚠️ SDK not available, creating mock ready()');
+                    log('⚠️ SDK ready() not available, using fallback');
                     readyCalled = true;
                     return true;
                 }
@@ -534,6 +570,9 @@
         // Initialize Mini App
         document.addEventListener('DOMContentLoaded', async () => {
             log('🚀 Mini App loaded, initializing...');
+            
+            // Load SDK first for compatibility
+            await loadSDK();
             
             // Load cover image immediately for fast startup
             loadCoverImage();
