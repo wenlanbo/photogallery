@@ -386,6 +386,10 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 Frame loaded, initializing...');
             
+            // Call ready() immediately when page loads
+            console.log('🎯 Calling ready() immediately on page load');
+            callReady();
+            
             try {
                 // Load images and create slideshow
                 await loadImagesFromAPI();
@@ -396,6 +400,10 @@
                 
                 // Start auto-play
                 startAutoPlay();
+                
+                // Call ready() again after everything is loaded
+                console.log('🎯 Calling ready() again after slideshow is ready');
+                callReady();
                 
                 // Fallback: call ready after 1 second if not called yet
                 setTimeout(() => {
