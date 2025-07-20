@@ -8,6 +8,16 @@
     <!-- Farcaster Mini App Meta Tags -->
     <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://w.enlan.bo/frame-og.png","button":{"title":"View Slideshow","action":{"type":"launch_frame","name":"New Day One","url":"https://w.enlan.bo/frame","splashImageUrl":"https://w.enlan.bo/app-icon.png","splashBackgroundColor":"#FFFFFF"}}}' />
     
+    <!-- Farcaster Mini App SDK -->
+    <script type="module">
+        import { sdk } from 'https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/index.js';
+        
+        // Make SDK available globally
+        window.farcasterSDK = sdk;
+        
+        console.log('✅ Farcaster SDK imported successfully:', sdk);
+    </script>
+    
     <style>
         * {
             margin: 0;
@@ -174,43 +184,111 @@
             console.log('window.location:', window.location.href);
             console.log('window.parent:', !!window.parent);
             console.log('window.top:', !!window.top);
+            console.log('window.farcasterSDK:', !!window.farcasterSDK);
             console.log('window.sdk:', !!window.sdk);
+            console.log('typeof sdk:', typeof sdk);
+            console.log('window.farcaster:', !!window.farcaster);
+            console.log('window.Farcaster:', !!window.Farcaster);
             
+            // Check imported Farcaster SDK
+            if (window.farcasterSDK) {
+                console.log('window.farcasterSDK:', window.farcasterSDK);
+                console.log('window.farcasterSDK.actions:', !!window.farcasterSDK.actions);
+                if (window.farcasterSDK.actions) {
+                    console.log('window.farcasterSDK.actions:', window.farcasterSDK.actions);
+                    console.log('window.farcasterSDK.actions.ready:', !!window.farcasterSDK.actions.ready);
+                }
+            }
+            
+            // Check all possible SDK locations
             if (window.sdk) {
+                console.log('window.sdk:', window.sdk);
                 console.log('window.sdk.actions:', !!window.sdk.actions);
                 if (window.sdk.actions) {
+                    console.log('window.sdk.actions:', window.sdk.actions);
                     console.log('window.sdk.actions.ready:', !!window.sdk.actions.ready);
                 }
             }
+            
+            if (typeof sdk !== 'undefined') {
+                console.log('global sdk:', sdk);
+                console.log('global sdk.actions:', !!sdk.actions);
+                if (sdk.actions) {
+                    console.log('global sdk.actions.ready:', !!sdk.actions.ready);
+                }
+            }
+            
+            if (window.farcaster) {
+                console.log('window.farcaster:', window.farcaster);
+                console.log('window.farcaster.ready:', !!window.farcaster.ready);
+                console.log('window.farcaster.actions:', !!window.farcaster.actions);
+            }
+            
+            if (window.Farcaster) {
+                console.log('window.Farcaster:', window.Farcaster);
+                console.log('window.Farcaster.ready:', !!window.Farcaster.ready);
+            }
+            
+            // Check if we're in an iframe
+            console.log('In iframe:', window !== window.top);
+            console.log('Parent origin:', window.parent.location.origin);
         }
 
-        function callReady() {
+        async function callReady() {
             if (readyCalled) return;
             
-            console.log('🚀 Calling sdk.actions.ready() to remove splash screen...');
+            console.log('🚀 Calling ready() to remove splash screen...');
             
             try {
-                // Primary method: sdk.actions.ready() for Mini Apps
-                if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
-                    window.sdk.actions.ready();
+                // Primary method: imported Farcaster SDK
+                if (window.farcasterSDK && window.farcasterSDK.actions && window.farcasterSDK.actions.ready) {
+                    await window.farcasterSDK.actions.ready();
+                    console.log('✅ window.farcasterSDK.actions.ready() called successfully');
+                    readyCalled = true;
+                    return true;
+                }
+                // Fallback: window.sdk.actions.ready() for Mini Apps
+                else if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
+                    await window.sdk.actions.ready();
                     console.log('✅ window.sdk.actions.ready() called successfully');
                     readyCalled = true;
                     return true;
                 }
                 // Fallback: global sdk variable
                 else if (typeof sdk !== 'undefined' && sdk && sdk.actions && sdk.actions.ready) {
-                    sdk.actions.ready();
+                    await sdk.actions.ready();
                     console.log('✅ global sdk.actions.ready() called successfully');
                     readyCalled = true;
                     return true;
                 }
+                // Fallback: window.farcaster.ready
+                else if (window.farcaster && window.farcaster.ready) {
+                    window.farcaster.ready();
+                    console.log('✅ window.farcaster.ready() called successfully');
+                    readyCalled = true;
+                    return true;
+                }
+                // Fallback: window.Farcaster.ready
+                else if (window.Farcaster && window.Farcaster.ready) {
+                    window.Farcaster.ready();
+                    console.log('✅ window.Farcaster.ready() called successfully');
+                    readyCalled = true;
+                    return true;
+                }
+                // Fallback: postMessage to parent
+                else if (window.parent && window.parent.postMessage) {
+                    window.parent.postMessage({ type: 'ready' }, '*');
+                    console.log('✅ postMessage ready sent to parent');
+                    readyCalled = true;
+                    return true;
+                }
                 else {
-                    console.log('⚠️ sdk.actions.ready() not available yet');
+                    console.log('⚠️ No ready methods available yet');
                     return false; // Return false to indicate we should try again later
                 }
                 
             } catch (error) {
-                console.error('❌ Error calling sdk.actions.ready():', error);
+                console.error('❌ Error calling ready():', error);
                 return false; // Return false to indicate we should try again later
             }
         }
@@ -390,40 +468,43 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 Mini App loaded, initializing...');
             
+            // Wait a bit for SDK to load
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             // Debug the environment first
             debugEnvironment();
             
-            // Try to call sdk.actions.ready() immediately
-            console.log('🎯 Calling sdk.actions.ready() immediately on page load');
-            let readySuccess = callReady();
+            // Try to call ready() immediately
+            console.log('🎯 Calling ready() immediately on page load');
+            let readySuccess = await callReady();
             
             // If ready() failed, keep trying until it succeeds
             if (!readySuccess && !readyCalled) {
-                console.log('🔄 sdk.actions.ready() not available, will keep trying...');
+                console.log('🔄 Ready() not available, will keep trying...');
                 
-                // Try every 50ms for the first 5 seconds
-                const readyInterval = setInterval(() => {
+                // Try every 100ms for the first 10 seconds
+                const readyInterval = setInterval(async () => {
                     if (readyCalled) {
                         clearInterval(readyInterval);
                         return;
                     }
                     
-                    console.log('🔄 Retrying sdk.actions.ready()...');
+                    console.log('🔄 Retrying ready()...');
                     debugEnvironment(); // Debug again to see if SDK appeared
-                    readySuccess = callReady();
+                    readySuccess = await callReady();
                     
                     if (readySuccess) {
                         clearInterval(readyInterval);
                     }
-                }, 50);
+                }, 100);
                 
-                // Stop trying after 5 seconds
+                // Stop trying after 10 seconds
                 setTimeout(() => {
                     clearInterval(readyInterval);
                     if (!readyCalled) {
-                        console.log('⏰ Stopped retrying sdk.actions.ready() after 5 seconds');
+                        console.log('⏰ Stopped retrying ready() after 10 seconds');
                     }
-                }, 5000);
+                }, 10000);
             }
             
             try {
@@ -439,68 +520,71 @@
                 
                 // Call ready() again after everything is loaded
                 console.log('🎯 Calling ready() again after slideshow is ready');
-                callReady();
+                await callReady();
                 
             } catch (error) {
                 console.error('❌ Initialization error:', error);
                 // Still try to call ready() even if there's an error
-                callReady();
+                await callReady();
             }
         });
 
-        // Also call sdk.actions.ready() when window loads
-        window.addEventListener('load', () => {
+        // Also call ready() when window loads
+        window.addEventListener('load', async () => {
             if (!readyCalled) {
-                console.log('🌐 Window loaded, calling sdk.actions.ready()');
-                callReady();
+                console.log('🌐 Window loaded, calling ready()');
+                await callReady();
             }
         });
 
         // Watch for SDK to become available
         let sdkCheckInterval = null;
         if (!readyCalled) {
-            sdkCheckInterval = setInterval(() => {
+            sdkCheckInterval = setInterval(async () => {
                 if (readyCalled) {
                     clearInterval(sdkCheckInterval);
                     return;
                 }
                 
-                // Check if SDK just became available
-                if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
-                    console.log('🎯 SDK detected! Calling sdk.actions.ready()...');
-                    callReady();
+                // Check if any ready method just became available
+                if ((window.farcasterSDK && window.farcasterSDK.actions && window.farcasterSDK.actions.ready) ||
+                    (window.sdk && window.sdk.actions && window.sdk.actions.ready) ||
+                    (window.farcaster && window.farcaster.ready) ||
+                    (window.Farcaster && window.Farcaster.ready)) {
+                    console.log('🎯 Ready method detected! Calling ready()...');
+                    await callReady();
                     clearInterval(sdkCheckInterval);
                 }
-            }, 25); // Check every 25ms for faster detection
+            }, 50); // Check every 50ms
             
-            // Stop checking after 10 seconds
+            // Stop checking after 15 seconds
             setTimeout(() => {
                 if (sdkCheckInterval) {
                     clearInterval(sdkCheckInterval);
-                    console.log('⏰ Stopped SDK checking after 10 seconds');
+                    console.log('⏰ Stopped SDK checking after 15 seconds');
                 }
-            }, 10000);
+            }, 15000);
         }
 
-        // Multiple fallback timeouts to ensure sdk.actions.ready() is called
-        setTimeout(() => {
+        // Multiple fallback timeouts to ensure ready() is called
+        setTimeout(async () => {
             if (!readyCalled) {
-                console.log('⏰ 500ms timeout: calling sdk.actions.ready()');
-                callReady();
+                console.log('⏰ 500ms timeout: calling ready()');
+                await callReady();
             }
         }, 500);
 
-        setTimeout(() => {
+        setTimeout(async () => {
             if (!readyCalled) {
-                console.log('⏰ 1s timeout: calling sdk.actions.ready()');
-                callReady();
+                console.log('⏰ 1s timeout: calling ready()');
+                await callReady();
             }
         }, 1000);
 
-        setTimeout(() => {
+        setTimeout(async () => {
             if (!readyCalled) {
-                console.log('⏰ 3s timeout: calling sdk.actions.ready()');
-                callReady();
+                console.log('⏰ 3s timeout: calling ready()');
+                await callReady();
             }
         }, 3000);
 
