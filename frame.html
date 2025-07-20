@@ -174,24 +174,50 @@
     <script>
         // Initialize Farcaster Frame SDK
         let sdk;
-        let coverImageLoaded = false;
+        let sdkReadyCalled = false;
         
         async function initializeFarcasterFrame() {
             try {
-                // Initialize the Farcaster Frame SDK
-                sdk = new Frame({
-                    frameUrl: window.location.href,
-                    frameData: {
-                        fid: 302199, // Your FID
-                        network: 1, // Mainnet
-                    },
-                });
+                // Check if we're in a Farcaster Frame environment
+                if (typeof Frame !== 'undefined') {
+                    // Initialize the Farcaster Frame SDK
+                    sdk = new Frame({
+                        frameUrl: window.location.href,
+                        frameData: {
+                            fid: 302199, // Your FID
+                            network: 1, // Mainnet
+                        },
+                    });
 
-                console.log('Farcaster Frame SDK initialized');
-                // Don't call ready() yet - wait for cover image to load
+                    console.log('Farcaster Frame SDK initialized');
+                } else {
+                    console.log('Not in Farcaster Frame environment');
+                }
                 
             } catch (error) {
                 console.error('Error initializing Farcaster Frame:', error);
+            }
+        }
+
+        async function callSdkReady() {
+            if (sdkReadyCalled) return;
+            
+            try {
+                if (sdk && typeof sdk.actions !== 'undefined' && typeof sdk.actions.ready === 'function') {
+                    await sdk.actions.ready();
+                    console.log('Farcaster Frame ready - splash screen removed');
+                } else {
+                    console.log('SDK not available, trying alternative method');
+                    // Try alternative method if SDK is not available
+                    if (window.farcaster && window.farcaster.ready) {
+                        await window.farcaster.ready();
+                        console.log('Alternative Farcaster ready method called');
+                    }
+                }
+                sdkReadyCalled = true;
+            } catch (error) {
+                console.error('Error calling sdk.actions.ready():', error);
+                sdkReadyCalled = true; // Prevent infinite retries
             }
         }
 
@@ -264,18 +290,10 @@
                 img.onload = () => {
                     updateStatus(`Image ${index + 1} loaded`);
                     
-                    // If this is the cover image (first image) and SDK is ready
-                    if (index === 0 && sdk && !coverImageLoaded) {
-                        coverImageLoaded = true;
+                    // If this is the cover image (first image), call sdk ready
+                    if (index === 0) {
                         updateStatus('Cover image loaded, calling sdk.actions.ready()');
-                        (async () => {
-                            try {
-                                await sdk.actions.ready();
-                                console.log('Farcaster Frame ready - splash screen removed');
-                            } catch (error) {
-                                console.error('Error calling sdk.actions.ready():', error);
-                            }
-                        })();
+                        callSdkReady();
                     }
                 };
 
@@ -283,17 +301,9 @@
                     updateStatus(`Image ${index + 1} failed`);
                     
                     // If cover image failed, still try to call ready() to remove splash screen
-                    if (index === 0 && sdk && !coverImageLoaded) {
-                        coverImageLoaded = true;
+                    if (index === 0) {
                         updateStatus('Cover image failed, but calling sdk.actions.ready() anyway');
-                        (async () => {
-                            try {
-                                await sdk.actions.ready();
-                                console.log('Farcaster Frame ready - splash screen removed');
-                            } catch (error) {
-                                console.error('Error calling sdk.actions.ready():', error);
-                            }
-                        })();
+                        callSdkReady();
                     }
                 };
 
@@ -406,6 +416,14 @@
             
             // Start auto-play immediately
             startAutoPlay();
+            
+            // Fallback: call sdk ready after a timeout if not called yet
+            setTimeout(() => {
+                if (!sdkReadyCalled) {
+                    updateStatus('Fallback: calling sdk.actions.ready() after timeout');
+                    callSdkReady();
+                }
+            }, 3000);
         });
 
         // Keyboard controls
