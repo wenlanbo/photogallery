@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Slideshow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .slideshow {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border: 3px solid #333;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ddd;
+            border: 2px solid #999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .card.active {
+            display: block !important;
+            opacity: 1 !important;
+        }
+
+        .card img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: #555;
+        }
+
+        .counter {
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .debug {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #333;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .debug h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .debug p {
+            margin: 5px 0;
+        }
+
+        .card-info {
+            background: #e8f4f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Debug Slideshow - Local Test</h1>
+        
+        <div class="debug">
+            <h3>Debug Info:</h3>
+            <p id="debugInfo">Loading...</p>
+        </div>
+        
+        <div class="slideshow" id="slideshow">
+            <!-- Cards will be created here -->
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="prevSlide()">← Previous</button>
+            <button class="btn" onclick="togglePlay()" id="playBtn">⏸ Pause</button>
+            <button class="btn" onclick="nextSlide()">Next →</button>
+        </div>
+        
+        <div class="counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">0</span>
+        </div>
+        
+        <div class="card-info" id="cardInfo">
+            Card info will appear here...
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        let totalSlides = 0;
+        let autoPlayInterval = null;
+        let cards = [];
+        
+        // Test images - using placeholder images that should definitely work
+        const testImages = [
+            'https://picsum.photos/800/600?random=1',
+            'https://picsum.photos/800/600?random=2',
+            'https://picsum.photos/800/600?random=3',
+            'https://picsum.photos/800/600?random=4',
+            'https://picsum.photos/800/600?random=5'
+        ];
+        
+        function updateDebug() {
+            const debugInfo = document.getElementById('debugInfo');
+            const cardInfo = document.getElementById('cardInfo');
+            
+            debugInfo.innerHTML = `
+                Current slide: ${currentSlide + 1}<br>
+                Total slides: ${totalSlides}<br>
+                Auto-play: ${autoPlayInterval ? 'ON' : 'OFF'}<br>
+                Active card display: ${cards[currentSlide] ? cards[currentSlide].style.display : 'N/A'}<br>
+                Active card opacity: ${cards[currentSlide] ? cards[currentSlide].style.opacity : 'N/A'}<br>
+                Active card classes: ${cards[currentSlide] ? cards[currentSlide].className : 'N/A'}
+            `;
+            
+            if (cards[currentSlide]) {
+                const img = cards[currentSlide].querySelector('img');
+                cardInfo.innerHTML = `
+                    Current card index: ${currentSlide}<br>
+                    Card element: ${cards[currentSlide].tagName}<br>
+                    Card classes: ${cards[currentSlide].className}<br>
+                    Card display: ${cards[currentSlide].style.display}<br>
+                    Card opacity: ${cards[currentSlide].style.opacity}<br>
+                    Image src: ${img ? img.src : 'No image'}<br>
+                    Image naturalWidth: ${img ? img.naturalWidth : 'N/A'}<br>
+                    Image naturalHeight: ${img ? img.naturalHeight : 'N/A'}
+                `;
+            }
+        }
+        
+        function createSlides() {
+            console.log('Creating slides...');
+            const slideshow = document.getElementById('slideshow');
+            slideshow.innerHTML = '';
+            cards = [];
+            
+            testImages.forEach((src, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card${index}`;
+                
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `Slide ${index + 1}`;
+                
+                img.onload = () => {
+                    console.log(`Image ${index + 1} loaded:`, src);
+                    updateDebug();
+                };
+                
+                img.onerror = () => {
+                    console.error(`Image ${index + 1} failed:`, src);
+                    updateDebug();
+                };
+                
+                card.appendChild(img);
+                slideshow.appendChild(card);
+                cards.push(card);
+                
+                console.log(`Created card ${index + 1}:`, card);
+            });
+            
+            totalSlides = cards.length;
+            document.getElementById('totalSlides').textContent = totalSlides;
+            console.log('Created', totalSlides, 'cards');
+        }
+        
+        function showSlide(index) {
+            console.log(`Showing slide ${index + 1}`);
+            
+            // Hide all cards
+            cards.forEach((card, i) => {
+                card.classList.remove('active');
+                console.log(`Card ${i + 1} classes after remove:`, card.className);
+            });
+            
+            // Show current card
+            cards[index].classList.add('active');
+            console.log(`Card ${index + 1} classes after add:`, cards[index].className);
+            
+            currentSlide = index;
+            document.getElementById('currentSlide').textContent = index + 1;
+            
+            updateDebug();
+        }
+        
+        function nextSlide() {
+            let next = currentSlide + 1;
+            if (next >= totalSlides) {
+                next = 0;
+            }
+            showSlide(next);
+        }
+        
+        function prevSlide() {
+            let prev = currentSlide - 1;
+            if (prev < 0) {
+                prev = totalSlides - 1;
+            }
+            showSlide(prev);
+        }
+        
+        function startAutoPlay() {
+            stopAutoPlay();
+            autoPlayInterval = setInterval(nextSlide, 3000);
+            document.getElementById('playBtn').textContent = '⏸ Pause';
+            updateDebug();
+        }
+        
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            document.getElementById('playBtn').textContent = '▶ Play';
+            updateDebug();
+        }
+        
+        function togglePlay() {
+            if (autoPlayInterval) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page loaded, initializing debug slideshow...');
+            createSlides();
+            showSlide(0);
+            startAutoPlay();
+            
+            // Check card status after a delay
+            setTimeout(() => {
+                console.log('Checking card status...');
+                cards.forEach((card, index) => {
+                    console.log(`Card ${index + 1}:`, {
+                        element: card,
+                        classes: card.className,
+                        display: card.style.display,
+                        opacity: card.style.opacity,
+                        img: card.querySelector('img')
+                    });
+                });
+                updateDebug();
+            }, 2000);
+        });
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    stopAutoPlay();
+                    prevSlide();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    stopAutoPlay();
+                    nextSlide();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    togglePlay();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html> 
