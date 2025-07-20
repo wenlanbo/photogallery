@@ -1,0 +1,24 @@
+{
+    "frame": {
+      "name": "Photo Gallery",
+      "version": "1",
+      "iconUrl": "https://w.enlan.bo/app-icon.png",
+      "homeUrl": "https://w.enlan.bo",
+      "imageUrl": "https://w.enlan.bo/screenshot1.png",
+      "splashImageUrl": "https://w.enlan.bo/splash.png",
+      "splashBackgroundColor": "#0000FF",
+      "webhookUrl": "https://w.enlan.bo/api/webhook",
+      "subtitle": "An Onchain photo gallery captured by wenlanbo",
+      "description": "Wenlanbo goes to events with a film camera so you can experience those events in film",
+      "primaryCategory": "entertainment",
+      "screenshotUrls": [
+        "https://w.enlan.bo/screenshot1.png"
+      ],
+      "heroImageUrl": "https://w.enlan.bo/screenshot1.png"
+    },
+    "accountAssociation": {
+      "header": "eyJmaWQiOjMwMjE5OSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDQyQTFjNTQwRjdjNWMxMDUzZmI0OEZEMGFGMmUyMDc0MDRlNDRBNzEifQ",
+      "payload": "eyJkb21haW4iOiJ3LmVubGFuLmJvIn0",
+      "signature": "wgQkPTmpRlHqwzxqCNPjHnnRp87HG/a2Tryu64/wYUMzKo2ShPstu+29BokUuE9lp6JgsaPftfKKNFX1A2PGmRs="
+    }
+  }
