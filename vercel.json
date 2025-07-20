@@ -22,58 +22,6 @@
       "use": "@vercel/static"
     },
     {
-      "src": "new-day-one.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "new-day-one.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "new-day-one-test.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "search-covers.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "debug-api.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "new-day-one-simple.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "new-day-one-working.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "new-day-one-test-simple.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "new-day-one-simple-fixed.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "new-day-one-force-visible.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "test-images.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "new-day-one-working-fixed.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "new-day-one-simple-working.html",
-      "use": "@vercel/static"
-    },
-    {
       "src": "icons/**",
       "use": "@vercel/static"
     },
@@ -96,60 +44,12 @@
       "dest": "/new-day-one.html"
     },
     {
-      "src": "/new-day-one-test",
-      "dest": "/new-day-one-test.html"
-    },
-    {
-      "src": "/search-covers",
-      "dest": "/search-covers.html"
-    },
-    {
-      "src": "/debug-api",
-      "dest": "/debug-api.html"
-    },
-    {
-      "src": "/new-day-one-simple",
-      "dest": "/new-day-one-simple.html"
-    },
-    {
-      "src": "/new-day-one-working",
-      "dest": "/new-day-one-working.html"
-    },
-    {
-      "src": "/new-day-one-test-simple",
-      "dest": "/new-day-one-test-simple.html"
-    },
-    {
-      "src": "/new-day-one-simple-fixed",
-      "dest": "/new-day-one-simple-fixed.html"
-    },
-    {
-      "src": "/new-day-one-force-visible",
-      "dest": "/new-day-one-force-visible.html"
-    },
-    {
-      "src": "/test-images",
-      "dest": "/test-images.html"
-    },
-    {
-      "src": "/new-day-one-working-fixed",
-      "dest": "/new-day-one-working-fixed.html"
-    },
-    {
-      "src": "/new-day-one-simple-working",
-      "dest": "/new-day-one-simple-working.html"
-    },
-    {
       "src": "/images/(.*)",
       "dest": "/images/$1"
     },
     {
       "src": "/icons/(.*)",
       "dest": "/icons/$1"
-    },
-    {
-      "src": "/images/(.*)",
-      "dest": "/images/$1"
     },
     {
       "src": "/sw.js",
