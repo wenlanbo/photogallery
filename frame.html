@@ -2,13 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Day One - Film Experience</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>New Day One - A Film Experience</title>
     
     <!-- Farcaster Mini App Meta Tags -->
     <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://w.enlan.bo/app-icon.png","button":{"title":"View Slideshow","action":{"type":"launch_frame","name":"New Day One","url":"https://w.enlan.bo/frame","splashImageUrl":"https://w.enlan.bo/app-icon.png","splashBackgroundColor":"#FFFFFF"}}}' />
     
-    <!-- Farcaster Mini App SDK will be loaded in DOMContentLoaded -->
+    <link rel="icon" type="image/png" href="icons/wenlanbo.png">
+    <link rel="shortcut icon" type="image/png" href="icons/wenlanbo.png">
+    <link rel="apple-touch-icon" href="icons/wenlanbo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         * {
@@ -20,7 +24,6 @@
         body {
             font-family: 'Inter', 'Roboto', sans-serif;
             background: #000;
-            color: white;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -55,10 +58,19 @@
             text-transform: uppercase;
         }
 
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-top: 80px;
+        }
+
         .slideshow-container {
             position: relative;
             width: 100vw;
-            height: 100vh;
+            height: calc(100vh - 80px);
             background: #000;
             overflow: hidden;
         }
@@ -92,12 +104,12 @@
         }
 
         .controls {
-            position: fixed;
+            position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             background: rgba(0,0,0,0.8);
             padding: 0.75rem;
             border-radius: 25px;
@@ -105,51 +117,138 @@
         }
 
         .btn {
-            background: rgba(255,255,255,0.9);
+            background: white;
             border: none;
-            color: #000;
-            padding: 0.5rem 1rem;
+            color: #333;
+            padding: 0.5rem 0.75rem;
             border-radius: 20px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: all 0.3s;
-            font-weight: 500;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn:hover {
-            background: white;
-            transform: translateY(-1px);
+        .btn:hover, .btn:active {
+            background: #f0f0f0;
+            transform: scale(1.05);
         }
 
         .counter {
             color: white;
             display: flex;
             align-items: center;
-            padding: 0 1rem;
-            font-size: 0.9rem;
+            padding: 0 0.75rem;
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
         .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             text-align: center;
+            padding: 2rem;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .farcaster-info {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .footer {
             background: rgba(0,0,0,0.8);
-            padding: 0.5rem 1rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
+            padding: 1rem 0;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .copyright {
+            font-size: 0.75rem;
             color: #ccc;
-            backdrop-filter: blur(10px);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.75rem;
+            }
+            
+            .title {
+                font-size: 1.2rem;
+            }
+            
+            .subtitle {
+                font-size: 0.7rem;
+            }
+            
+            .main {
+                margin-top: 70px;
+            }
+            
+            .slideshow-container {
+                height: calc(100vh - 70px);
+            }
+            
+            .controls {
+                bottom: 15px;
+                padding: 0.5rem;
+                gap: 0.25rem;
+            }
+            
+            .btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+                min-width: 35px;
+            }
+            
+            .counter {
+                padding: 0 0.5rem;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Touch-friendly controls */
+        .btn {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* Prevent text selection */
+        .slideshow-container {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
     </style>
 </head>
@@ -159,167 +258,65 @@
         <p class="subtitle">A Film Experience</p>
     </header>
 
-    <div class="farcaster-info">
-        📸 Farcaster Frame
-    </div>
+    <main class="main">
+        <div class="slideshow-container" id="slideshow">
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <div>Loading Film Experience...</div>
+            </div>
+        </div>
+    </main>
 
-    <div class="slideshow-container" id="slideshow">
-        <div class="loading" id="loading">Loading Film Experience...</div>
-    </div>
+    <footer class="footer">
+        <div class="container">
+            <p class="copyright">© 2025 Wenlanbo. All rights reserved.</p>
+        </div>
+    </footer>
 
-    <script>
-        // Farcaster Mini App ready() call
-        let readyCalled = false;
+    <script type="module">
+        // Import Farcaster Mini App SDK
         import { sdk } from '@farcaster/miniapp-sdk';
-        function debugEnvironment() {
-            console.log('🔍 Debugging Farcaster Mini App environment...');
-            console.log('window.location:', window.location.href);
-            console.log('window.parent:', !!window.parent);
-            console.log('window.top:', !!window.top);
-            console.log('imported sdk:', !!sdk);
-            console.log('window.sdk:', !!window.sdk);
-            console.log('typeof sdk:', typeof sdk);
-            console.log('window.farcaster:', !!window.farcaster);
-            console.log('window.Farcaster:', !!window.Farcaster);
-            
-            // Check imported Farcaster SDK
-            if (sdk) {
-                console.log('imported sdk:', sdk);
-                console.log('imported sdk.actions:', !!sdk.actions);
-                if (sdk.actions) {
-                    console.log('imported sdk.actions:', sdk.actions);
-                    console.log('imported sdk.actions.ready:', !!sdk.actions.ready);
-                }
-            }
-            
-            // Check all possible SDK locations
-            if (window.sdk) {
-                console.log('window.sdk:', window.sdk);
-                console.log('window.sdk.actions:', !!window.sdk.actions);
-                if (window.sdk.actions) {
-                    console.log('window.sdk.actions:', window.sdk.actions);
-                    console.log('window.sdk.actions.ready:', !!window.sdk.actions.ready);
-                }
-            }
-            
-            if (typeof sdk !== 'undefined') {
-                console.log('global sdk:', sdk);
-                console.log('global sdk.actions:', !!sdk.actions);
-                if (sdk.actions) {
-                    console.log('global sdk.actions.ready:', !!sdk.actions.ready);
-                }
-            }
-            
-            if (window.farcaster) {
-                console.log('window.farcaster:', window.farcaster);
-                console.log('window.farcaster.ready:', !!window.farcaster.ready);
-                console.log('window.farcaster.actions:', !!window.farcaster.actions);
-            }
-            
-            if (window.Farcaster) {
-                console.log('window.Farcaster:', window.Farcaster);
-                console.log('window.Farcaster.ready:', !!window.Farcaster.ready);
-            }
-            
-            // Check if we're in an iframe
-            console.log('In iframe:', window !== window.top);
-            console.log('Parent origin:', window.parent.location.origin);
+
+        // Mobile-optimized slideshow
+        let images = [];
+        let currentSlide = 0;
+        let autoPlayInterval = null;
+        let slides = [];
+        let isLoading = true;
+        let readyCalled = false;
+
+        function log(message) {
+            console.log(`[Farcaster Mini App] ${message}`);
         }
 
+        // Call ready() to remove splash screen
         async function callReady() {
             if (readyCalled) return;
             
-            console.log('🚀 Calling ready() to remove splash screen...');
+            log('🚀 Calling ready() to remove splash screen...');
             
             try {
-                // Primary method: imported Farcaster SDK
                 if (sdk && sdk.actions && sdk.actions.ready) {
                     await sdk.actions.ready();
-                    console.log('✅ sdk.actions.ready() called successfully');
+                    log('✅ sdk.actions.ready() called successfully');
+                    readyCalled = true;
+                    return true;
+                } else {
+                    log('⚠️ SDK not available, creating mock ready()');
                     readyCalled = true;
                     return true;
                 }
-                // Fallback: window.sdk.actions.ready() for Mini Apps
-                else if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
-                    await window.sdk.actions.ready();
-                    console.log('✅ window.sdk.actions.ready() called successfully');
-                    readyCalled = true;
-                    return true;
-                }
-                // Fallback: global sdk variable
-                else if (typeof sdk !== 'undefined' && sdk && sdk.actions && sdk.actions.ready) {
-                    await sdk.actions.ready();
-                    console.log('✅ global sdk.actions.ready() called successfully');
-                    readyCalled = true;
-                    return true;
-                }
-                // Fallback: window.farcaster.ready
-                else if (window.farcaster && window.farcaster.ready) {
-                    window.farcaster.ready();
-                    console.log('✅ window.farcaster.ready() called successfully');
-                    readyCalled = true;
-                    return true;
-                }
-                // Fallback: window.Farcaster.ready
-                else if (window.Farcaster && window.Farcaster.ready) {
-                    window.Farcaster.ready();
-                    console.log('✅ window.Farcaster.ready() called successfully');
-                    readyCalled = true;
-                    return true;
-                }
-                // Fallback: Check for any ready function in the global scope
-                else if (typeof ready === 'function') {
-                    ready();
-                    console.log('✅ Global ready() function called successfully');
-                    readyCalled = true;
-                    return true;
-                }
-                // Fallback: postMessage to parent
-                else if (window.parent && window.parent.postMessage) {
-                    window.parent.postMessage({ type: 'ready' }, '*');
-                    console.log('✅ postMessage ready sent to parent');
-                    readyCalled = true;
-                    return true;
-                }
-                // Last resort: Create a mock SDK and call ready() anyway
-                else {
-                    console.log('⚠️ No ready methods available, creating mock SDK and calling ready()');
-                    
-                    // Create a mock SDK to satisfy the Mini App environment
-                    if (!window.sdk) {
-                        window.sdk = {
-                            actions: {
-                                ready: async function() {
-                                    console.log('✅ Mock SDK ready() called');
-                                    return Promise.resolve();
-                                }
-                            }
-                        };
-                    }
-                    
-                    // Call the mock ready function
-                    if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
-                        await window.sdk.actions.ready();
-                        console.log('✅ Mock SDK ready() called successfully');
-                    }
-                    
-                    readyCalled = true;
-                    return true;
-                }
-                
             } catch (error) {
-                console.error('❌ Error calling ready():', error);
-                // Even if there's an error, mark as ready to prevent splash screen from persisting
+                log(`❌ Error calling ready(): ${error.message}`);
                 readyCalled = true;
                 return true;
             }
         }
 
-        // Slideshow functionality
-        let images = [];
         async function loadImagesFromAPI() {
             try {
-                console.log('📸 Loading images from API...');
+                log('📸 Loading images from API...');
+                
                 const response = await fetch('/api/photos?folder=new-day-one&limit=50');
                 
                 if (!response.ok) {
@@ -331,25 +328,14 @@
                 
                 if (apiImages.length > 0) {
                     images = apiImages.map(photo => photo.src || photo.url);
-                    console.log(`✅ Loaded ${images.length} images from API`);
+                    log(`✅ Loaded ${images.length} images from API`);
                 } else {
-                    // Fallback to local images
-                    images = [
-                        '/images/L1000031.JPG',
-                        '/images/L1000032.JPG',
-                        '/images/L1000036.JPG',
-                        '/images/L1000039.jpg',
-                        '/images/L1000048.jpg',
-                        '/images/L1000057.jpg',
-                        '/images/L1000058.jpg',
-                        '/images/L1000111.jpg',
-                        '/images/L1000151.jpg',
-                        '/images/L1000172.jpg'
-                    ];
-                    console.log('⚠️ No API images, using local images');
+                    throw new Error('No images found in API response');
                 }
+                
             } catch (error) {
-                console.error('❌ Error loading from API:', error);
+                log(`❌ API failed: ${error.message}`);
+                
                 // Fallback to local images
                 images = [
                     '/images/L1000031.JPG',
@@ -363,23 +349,17 @@
                     '/images/L1000151.jpg',
                     '/images/L1000172.jpg'
                 ];
-                console.log('⚠️ API failed, using local images');
+                log(`⚠️ Using ${images.length} fallback images`);
             }
         }
 
-        let currentSlide = 0;
-        let autoPlayInterval = null;
-        let slides = [];
-
         function createSlides() {
-            console.log('🎬 Creating slides...');
-            console.log('📸 Images to load:', images);
-            
+            log('🎬 Creating slides...');
             const slideshow = document.getElementById('slideshow');
             slideshow.innerHTML = '';
 
             if (images.length === 0) {
-                console.log('⚠️ No images available, creating placeholder slide');
+                log('⚠️ No images available, creating placeholder slide');
                 const slide = document.createElement('div');
                 slide.className = 'slide active';
                 slide.innerHTML = '<div style="text-align: center; padding: 50px; color: white;">No images available</div>';
@@ -398,21 +378,21 @@
                 img.alt = `Slide ${index + 1}`;
 
                 img.onload = () => {
-                    console.log(`✅ Image ${index + 1} loaded: ${src}`);
+                    log(`✅ Image ${index + 1} loaded: ${src}`);
                     
                     // Call ready() when first image loads
                     if (index === 0) {
-                        console.log('🎯 First image loaded, calling ready()');
+                        log('🎯 First image loaded, calling ready()');
                         callReady();
                     }
                 };
 
                 img.onerror = () => {
-                    console.log(`❌ Image ${index + 1} failed: ${src}`);
+                    log(`❌ Image ${index + 1} failed: ${src}`);
                     
                     // Call ready() even if first image fails
                     if (index === 0) {
-                        console.log('🎯 First image failed, calling ready() anyway');
+                        log('🎯 First image failed, calling ready() anyway');
                         callReady();
                     }
                 };
@@ -422,11 +402,13 @@
                 slides.push(slide);
             });
 
-            console.log(`✅ Created ${slides.length} slides`);
+            log(`✅ Created ${slides.length} slides`);
         }
 
         function showSlide(index) {
-            console.log(`🎬 Showing slide ${index + 1}`);
+            if (slides.length === 0) return;
+            
+            log(`🎬 Showing slide ${index + 1}`);
             
             slides.forEach((slide, i) => {
                 slide.classList.remove('active');
@@ -438,6 +420,8 @@
         }
 
         function nextSlide() {
+            if (slides.length === 0) return;
+            
             let next = currentSlide + 1;
             if (next >= slides.length) {
                 next = 0;
@@ -446,6 +430,8 @@
         }
 
         function prevSlide() {
+            if (slides.length === 0) return;
+            
             let prev = currentSlide - 1;
             if (prev < 0) {
                 prev = slides.length - 1;
@@ -463,7 +449,7 @@
         function startAutoPlay() {
             stopAutoPlay();
             autoPlayInterval = setInterval(nextSlide, 4000);
-            console.log('▶️ Auto-play started');
+            log('▶️ Auto-play started');
         }
 
         function stopAutoPlay() {
@@ -479,9 +465,10 @@
 
             const prevBtn = document.createElement('button');
             prevBtn.className = 'btn';
-            prevBtn.textContent = '←';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
             prevBtn.onclick = () => {
                 prevSlide();
+                startAutoPlay();
             };
 
             const counter = document.createElement('div');
@@ -490,156 +477,143 @@
 
             const nextBtn = document.createElement('button');
             nextBtn.className = 'btn';
-            nextBtn.textContent = '→';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
             nextBtn.onclick = () => {
                 nextSlide();
+                startAutoPlay();
             };
 
             controls.appendChild(prevBtn);
             controls.appendChild(counter);
             controls.appendChild(nextBtn);
 
-            document.body.appendChild(controls);
+            document.getElementById('slideshow').appendChild(controls);
         }
 
         function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+            isLoading = false;
         }
 
-
+        function showError(message) {
+            const slideshow = document.getElementById('slideshow');
+            slideshow.innerHTML = `
+                <div class="error-message">
+                    <div>⚠️ ${message}</div>
+                    <div style="margin-top: 1rem; font-size: 0.8rem;">
+                        Please check your connection and try again.
+                    </div>
+                </div>
+            `;
+        }
 
         // Initialize Mini App
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🚀 Mini App loaded, initializing...');
-            
-            // Debug the environment first
-            debugEnvironment();
-            
-            // Try to call ready() immediately
-            console.log('🎯 Calling ready() immediately on page load');
-            let readySuccess = await callReady();
-            
-            // If ready() failed, keep trying until it succeeds
-            if (!readySuccess && !readyCalled) {
-                console.log('🔄 Ready() not available, will keep trying...');
-                
-                // Try every 100ms for the first 10 seconds
-                const readyInterval = setInterval(async () => {
-                    if (readyCalled) {
-                        clearInterval(readyInterval);
-                        return;
-                    }
-                    
-                    console.log('🔄 Retrying ready()...');
-                    debugEnvironment(); // Debug again to see if SDK appeared
-                    readySuccess = await callReady();
-                    
-                    if (readySuccess) {
-                        clearInterval(readyInterval);
-                    }
-                }, 100);
-                
-                // Stop trying after 10 seconds
-                setTimeout(() => {
-                    clearInterval(readyInterval);
-                    if (!readyCalled) {
-                        console.log('⏰ Stopped retrying ready() after 10 seconds');
-                    }
-                }, 10000);
-            }
+            log('🚀 Mini App loaded, initializing...');
             
             try {
-                // Load images and create slideshow
+                // Load images first
                 await loadImagesFromAPI();
+                
+                if (images.length === 0) {
+                    showError('No images available');
+                    await callReady(); // Still call ready even if no images
+                    return;
+                }
+                
+                // Create slideshow
                 createSlides();
                 createControls();
                 showSlide(0);
                 hideLoading();
                 
-                // Start auto-play
-                startAutoPlay();
+                // Start auto-play after a short delay
+                setTimeout(() => {
+                    startAutoPlay();
+                }, 1000);
                 
-                // Call ready() again after everything is loaded
-                console.log('🎯 Calling ready() again after slideshow is ready');
-                await callReady();
+                log('✅ Initialization complete');
                 
             } catch (error) {
-                console.error('❌ Initialization error:', error);
-                // Still try to call ready() even if there's an error
-                await callReady();
+                log(`❌ Initialization failed: ${error.message}`);
+                showError('Failed to load slideshow');
+                await callReady(); // Still call ready even if initialization fails
             }
         });
-
-        // Also call ready() when window loads
-        window.addEventListener('load', async () => {
-            if (!readyCalled) {
-                console.log('🌐 Window loaded, calling ready()');
-                await callReady();
-            }
-        });
-
-        // Watch for SDK to become available
-        let sdkCheckInterval = null;
-        if (!readyCalled) {
-            sdkCheckInterval = setInterval(async () => {
-                if (readyCalled) {
-                    clearInterval(sdkCheckInterval);
-                    return;
-                }
-                
-                // Check if any ready method just became available
-                if ((window.farcasterSDK && window.farcasterSDK.actions && window.farcasterSDK.actions.ready) ||
-                    (window.sdk && window.sdk.actions && window.sdk.actions.ready) ||
-                    (window.farcaster && window.farcaster.ready) ||
-                    (window.Farcaster && window.Farcaster.ready)) {
-                    console.log('🎯 Ready method detected! Calling ready()...');
-                    await callReady();
-                    clearInterval(sdkCheckInterval);
-                }
-            }, 50); // Check every 50ms
-            
-            // Stop checking after 15 seconds
-            setTimeout(() => {
-                if (sdkCheckInterval) {
-                    clearInterval(sdkCheckInterval);
-                    console.log('⏰ Stopped SDK checking after 15 seconds');
-                }
-            }, 15000);
-        }
-
-        // Multiple fallback timeouts to ensure ready() is called
-        setTimeout(async () => {
-            if (!readyCalled) {
-                console.log('⏰ 500ms timeout: calling ready()');
-                await callReady();
-            }
-        }, 500);
-
-        setTimeout(async () => {
-            if (!readyCalled) {
-                console.log('⏰ 1s timeout: calling ready()');
-                await callReady();
-            }
-        }, 1000);
-
-        setTimeout(async () => {
-            if (!readyCalled) {
-                console.log('⏰ 3s timeout: calling ready()');
-                await callReady();
-            }
-        }, 3000);
 
         // Keyboard controls
         document.addEventListener('keydown', (e) => {
+            if (isLoading) return;
+            
             switch(e.key) {
                 case 'ArrowLeft':
                     e.preventDefault();
                     prevSlide();
+                    startAutoPlay();
                     break;
                 case 'ArrowRight':
                     e.preventDefault();
                     nextSlide();
+                    startAutoPlay();
                     break;
+                case ' ':
+                    e.preventDefault();
+                    if (autoPlayInterval) {
+                        stopAutoPlay();
+                    } else {
+                        startAutoPlay();
+                    }
+                    break;
+            }
+        });
+
+        // Touch controls for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (isLoading) return;
+            
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+                startAutoPlay();
+            }
+        }
+
+        // Pause autoplay when page is not visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoPlay();
+            } else {
+                if (!isLoading && slides.length > 0) {
+                    startAutoPlay();
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (slides.length > 0) {
+                showSlide(currentSlide);
             }
         });
     </script>
