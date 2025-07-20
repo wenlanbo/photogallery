@@ -38,6 +38,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "debug-api.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "icons/**",
       "use": "@vercel/static"
     },
@@ -66,6 +70,10 @@
     {
       "src": "/search-covers",
       "dest": "/search-covers.html"
+    },
+    {
+      "src": "/debug-api",
+      "dest": "/debug-api.html"
     },
     {
       "src": "/icons/(.*)",

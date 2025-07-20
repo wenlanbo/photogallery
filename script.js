@@ -457,6 +457,19 @@ class PhotoGallery {
 
 // Initialize the gallery when the page loads
 document.addEventListener('DOMContentLoaded', () => {
+    // Suppress Vercel analytics warnings
+    const originalWarn = console.warn;
+    console.warn = function(...args) {
+        const message = args.join(' ');
+        if (message.includes('fragment with name') || 
+            message.includes('graphql-tag') ||
+            message.includes('BaseJam') ||
+            message.includes('RecordingLink')) {
+            return; // Suppress these warnings
+        }
+        originalWarn.apply(console, args);
+    };
+    
     new PhotoGallery();
 });
 

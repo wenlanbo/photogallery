@@ -108,15 +108,24 @@ app.get('/api/photos', async (req, res) => {
         createdTime: blob.uploadedAt
       }));
       
-      const paginatedPhotos = allPhotos.slice(offset, offset + limit);
-      
-      console.log(`Returning ${paginatedPhotos.length} photos from Vercel Blob, total: ${allPhotos.length}, hasMore: ${offset + limit < allPhotos.length}`);
-      
-      res.json({
-        photos: paginatedPhotos,
-        hasMore: offset + limit < allPhotos.length,
-        total: allPhotos.length
-      });
+      // For new-day-one folder, return all photos without pagination
+      if (folder === 'new-day-one') {
+        console.log(`Returning all ${allPhotos.length} photos for new-day-one folder`);
+        res.json({
+          photos: allPhotos,
+          hasMore: false,
+          total: allPhotos.length
+        });
+      } else {
+        const paginatedPhotos = allPhotos.slice(offset, offset + limit);
+        console.log(`Returning ${paginatedPhotos.length} photos from Vercel Blob, total: ${allPhotos.length}, hasMore: ${offset + limit < allPhotos.length}`);
+        
+        res.json({
+          photos: paginatedPhotos,
+          hasMore: offset + limit < allPhotos.length,
+          total: allPhotos.length
+        });
+      }
     } else {
       // Fallback to static photos if Vercel Blob not configured
       let allPhotos = [];

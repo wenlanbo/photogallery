@@ -14,6 +14,21 @@ class CardDeckExperience {
         this.currentIndexSpan = document.getElementById('currentIndex');
         this.totalCountSpan = document.getElementById('totalCount');
         
+        // Verify DOM elements exist
+        if (!this.cardDeck) {
+            console.error('Card deck element not found!');
+            return;
+        }
+        if (!this.loading) {
+            console.error('Loading element not found!');
+            return;
+        }
+        if (!this.navigation) {
+            console.error('Navigation element not found!');
+            return;
+        }
+        
+        console.log('All DOM elements found, initializing...');
         this.init();
     }
     
@@ -31,14 +46,8 @@ class CardDeckExperience {
         try {
             console.log('Attempting to load photos from API...');
             
-            // First, try to search for cover images
-            console.log('Searching for cover images...');
-            const coverResponse = await fetch('/api/search-covers');
-            const coverData = await coverResponse.json();
-            console.log('Cover search result:', coverData);
-            
             // Load photos from the /new-day-one folder in Vercel Blob
-            const response = await fetch('/api/photos?folder=new-day-one');
+            const response = await fetch('/api/photos?folder=new-day-one&limit=100');
             console.log('API Response status:', response.status);
             
             if (!response.ok) {
@@ -47,26 +56,30 @@ class CardDeckExperience {
             
             const data = await response.json();
             console.log('API Response data:', data);
+            console.log('Total photos available:', data.total);
+            console.log('Photos in current page:', data.photos ? data.photos.length : 0);
             
             this.photos = data.photos || [];
             console.log('Photos loaded:', this.photos.length);
             
-            // If no photos found but we have cover images, use them
-            if (this.photos.length === 0 && coverData.covers && coverData.covers.length > 0) {
-                console.log('No photos in new-day-one folder, but found cover images. Using covers...');
-                this.photos = coverData.covers;
-                this.createCards();
-                this.hideLoading();
-                return;
-            }
-            
-            // If no photos found, show a message
+            // If no photos found, try to search for cover images
             if (this.photos.length === 0) {
-                console.log('No photos found, showing message...');
-                this.showNoPhotosMessage();
-                return;
+                console.log('No photos in new-day-one folder, searching for cover images...');
+                const coverResponse = await fetch('/api/search-covers');
+                const coverData = await coverResponse.json();
+                console.log('Cover search result:', coverData);
+                
+                if (coverData.covers && coverData.covers.length > 0) {
+                    console.log('Found cover images, using them...');
+                    this.photos = coverData.covers;
+                } else {
+                    console.log('No cover images found, showing message...');
+                    this.showNoPhotosMessage();
+                    return;
+                }
             }
             
+            console.log('Final photos array:', this.photos);
             this.createCards();
             this.hideLoading();
             
@@ -98,7 +111,19 @@ class CardDeckExperience {
     
     createCards() {
         console.log('Creating cards for', this.photos.length, 'photos');
+        console.log('Photos array:', this.photos);
+        
+        if (!this.cardDeck) {
+            console.error('Card deck element not found!');
+            return;
+        }
+        
         this.cardDeck.innerHTML = '';
+        
+        if (this.photos.length === 0) {
+            console.error('No photos to create cards for!');
+            return;
+        }
         
         this.photos.forEach((photo, index) => {
             const card = document.createElement('div');
@@ -111,11 +136,18 @@ class CardDeckExperience {
             }
             
             const img = document.createElement('img');
-            img.src = photo.src || photo.url;
+            const imageSrc = photo.src || photo.url;
+            img.src = imageSrc;
             img.alt = photo.alt || `Photo ${index + 1}`;
             img.loading = 'lazy';
             
-            console.log(`Creating card ${index + 1}:`, img.src);
+            // Add error handling for images
+            img.onerror = () => {
+                console.error(`Failed to load image: ${imageSrc}`);
+                img.src = '/images/724-10.JPG'; // Fallback image
+            };
+            
+            console.log(`Creating card ${index + 1}:`, imageSrc);
             
             card.appendChild(img);
             this.cardDeck.appendChild(card);
@@ -123,6 +155,9 @@ class CardDeckExperience {
         
         this.totalCountSpan.textContent = this.photos.length;
         console.log('Cards created, total count:', this.photos.length);
+        
+        // Force a reflow to ensure cards are visible
+        this.cardDeck.offsetHeight;
     }
     
     showCurrentCard() {
@@ -256,13 +291,29 @@ class CardDeckExperience {
 
 // Initialize the experience when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Suppress Vercel service worker errors
+    // Suppress Vercel service worker errors and GraphQL warnings
     window.addEventListener('error', (e) => {
-        if (e.message.includes('mobx-state-tree') || e.message.includes('sw.js')) {
+        if (e.message.includes('mobx-state-tree') || 
+            e.message.includes('sw.js') ||
+            e.message.includes('graphql-tag') ||
+            e.message.includes('fragment with name')) {
             e.preventDefault();
             return false;
         }
     });
+    
+    // Suppress console warnings from Vercel analytics
+    const originalWarn = console.warn;
+    console.warn = function(...args) {
+        const message = args.join(' ');
+        if (message.includes('fragment with name') || 
+            message.includes('graphql-tag') ||
+            message.includes('BaseJam') ||
+            message.includes('RecordingLink')) {
+            return; // Suppress these warnings
+        }
+        originalWarn.apply(console, args);
+    };
     
     new CardDeckExperience();
 }); 
