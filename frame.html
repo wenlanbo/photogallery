@@ -12,7 +12,7 @@
     <meta property="fc:frame:post_url" content="https://w.enlan.bo/api/frame" />
     
     <!-- Farcaster Mini App SDK -->
-    <script src="https://unpkg.com/@farcaster/miniapp-sdk@0.0.7/dist/index.js"></script>
+    <script src="https://unpkg.com/@farcaster/frame-js@0.0.8/dist/index.js"></script>
     
     <style>
         * {
@@ -178,12 +178,12 @@
 
         async function initializeFarcasterSDK() {
             try {
-                console.log('🔧 Initializing Farcaster Mini App SDK...');
+                console.log('🔧 Initializing Farcaster Frame SDK...');
                 
                 // Wait for SDK to be available
                 await new Promise(resolve => {
                     const checkSDK = () => {
-                        if (typeof window.FarcasterMiniApp !== 'undefined') {
+                        if (typeof Frame !== 'undefined') {
                             resolve();
                         } else {
                             setTimeout(checkSDK, 100);
@@ -193,7 +193,7 @@
                 });
 
                 // Initialize the SDK
-                sdk = new window.FarcasterMiniApp({
+                sdk = new Frame({
                     frameUrl: window.location.href,
                     frameData: {
                         fid: 302199,
@@ -201,7 +201,7 @@
                     },
                 });
 
-                console.log('✅ Farcaster Mini App SDK initialized');
+                console.log('✅ Farcaster Frame SDK initialized');
                 
             } catch (error) {
                 console.error('❌ Error initializing SDK:', error);
