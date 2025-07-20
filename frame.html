@@ -6,7 +6,7 @@
     <title>New Day One - Film Experience</title>
     
     <!-- Farcaster Mini App Meta Tags -->
-    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://w.enlan.bo/frame-og.png","button":{"title":"View Slideshow","action":{"type":"launch_frame","name":"New Day One","url":"https://w.enlan.bo/frame","splashImageUrl":"https://w.enlan.bo/app-icon.png","splashBackgroundColor":"#FFFFFF"}}}' />
+    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://w.enlan.bo/app-icon.png","button":{"title":"View Slideshow","action":{"type":"launch_frame","name":"New Day One","url":"https://w.enlan.bo/frame","splashImageUrl":"https://w.enlan.bo/app-icon.png","splashBackgroundColor":"#FFFFFF"}}}' />
     
     <!-- Farcaster Mini App SDK will be loaded in DOMContentLoaded -->
     
@@ -170,25 +170,25 @@
     <script>
         // Farcaster Mini App ready() call
         let readyCalled = false;
-
+        import { sdk } from '@farcaster/miniapp-sdk';
         function debugEnvironment() {
             console.log('🔍 Debugging Farcaster Mini App environment...');
             console.log('window.location:', window.location.href);
             console.log('window.parent:', !!window.parent);
             console.log('window.top:', !!window.top);
-            console.log('window.farcasterSDK:', !!window.farcasterSDK);
+            console.log('imported sdk:', !!sdk);
             console.log('window.sdk:', !!window.sdk);
             console.log('typeof sdk:', typeof sdk);
             console.log('window.farcaster:', !!window.farcaster);
             console.log('window.Farcaster:', !!window.Farcaster);
             
             // Check imported Farcaster SDK
-            if (window.farcasterSDK) {
-                console.log('window.farcasterSDK:', window.farcasterSDK);
-                console.log('window.farcasterSDK.actions:', !!window.farcasterSDK.actions);
-                if (window.farcasterSDK.actions) {
-                    console.log('window.farcasterSDK.actions:', window.farcasterSDK.actions);
-                    console.log('window.farcasterSDK.actions.ready:', !!window.farcasterSDK.actions.ready);
+            if (sdk) {
+                console.log('imported sdk:', sdk);
+                console.log('imported sdk.actions:', !!sdk.actions);
+                if (sdk.actions) {
+                    console.log('imported sdk.actions:', sdk.actions);
+                    console.log('imported sdk.actions.ready:', !!sdk.actions.ready);
                 }
             }
             
@@ -233,9 +233,9 @@
             
             try {
                 // Primary method: imported Farcaster SDK
-                if (window.farcasterSDK && window.farcasterSDK.actions && window.farcasterSDK.actions.ready) {
-                    await window.farcasterSDK.actions.ready();
-                    console.log('✅ window.farcasterSDK.actions.ready() called successfully');
+                if (sdk && sdk.actions && sdk.actions.ready) {
+                    await sdk.actions.ready();
+                    console.log('✅ sdk.actions.ready() called successfully');
                     readyCalled = true;
                     return true;
                 }
@@ -506,81 +506,11 @@
             document.getElementById('loading').style.display = 'none';
         }
 
-        // Load Farcaster SDK
-        async function loadFarcasterSDK() {
-            console.log('🔄 Loading Farcaster SDK...');
-            
-            // Check if SDK is already available (injected by Mini App environment)
-            if (window.sdk && window.sdk.actions) {
-                window.farcasterSDK = window.sdk;
-                console.log('✅ Farcaster SDK already available from Mini App environment:', window.farcasterSDK);
-                return true;
-            }
-            
-            // Method 1: Try local import if package is installed
-            try {
-                const { sdk } = await import('./node_modules/@farcaster/miniapp-sdk/dist/index.js');
-                window.farcasterSDK = sdk;
-                console.log('✅ Farcaster SDK loaded from local node_modules:', window.farcasterSDK);
-                return true;
-            } catch (error) {
-                console.log('⚠️ Local import failed:', error.message);
-            }
-            
-            // Method 2: Try loading as script tag from jsDelivr
-            return new Promise((resolve) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@latest/dist/index.js';
-                script.onload = function() {
-                    if (window.FarcasterSDK) {
-                        window.farcasterSDK = window.FarcasterSDK;
-                        console.log('✅ Farcaster SDK loaded via script tag:', window.farcasterSDK);
-                        resolve(true);
-                    } else if (window.sdk) {
-                        window.farcasterSDK = window.sdk;
-                        console.log('✅ Farcaster SDK found as window.sdk:', window.farcasterSDK);
-                        resolve(true);
-                    } else {
-                        console.log('⚠️ Script loaded but SDK not found');
-                        resolve(false);
-                    }
-                };
-                script.onerror = function() {
-                    console.log('⚠️ Script tag loading failed, trying alternative...');
-                    
-                    // Method 3: Try loading from unpkg as fallback
-                    const script2 = document.createElement('script');
-                    script2.src = 'https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/index.js';
-                    script2.onload = function() {
-                        if (window.FarcasterSDK) {
-                            window.farcasterSDK = window.FarcasterSDK;
-                            console.log('✅ Farcaster SDK loaded via unpkg fallback:', window.farcasterSDK);
-                            resolve(true);
-                        } else if (window.sdk) {
-                            window.farcasterSDK = window.sdk;
-                            console.log('✅ Farcaster SDK found as window.sdk via unpkg:', window.farcasterSDK);
-                            resolve(true);
-                        } else {
-                            console.log('⚠️ Both CDN methods failed');
-                            resolve(false);
-                        }
-                    };
-                    script2.onerror = function() {
-                        console.log('⚠️ All SDK loading methods failed');
-                        resolve(false);
-                    };
-                    document.head.appendChild(script2);
-                };
-                document.head.appendChild(script);
-            });
-        }
+
 
         // Initialize Mini App
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 Mini App loaded, initializing...');
-            
-            // Try to load the SDK first
-            await loadFarcasterSDK();
             
             // Debug the environment first
             debugEnvironment();
