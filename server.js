@@ -45,8 +45,8 @@ app.get('/api/photos', async (req, res) => {
         console.log('No blobs found in new-day-one folder, searching for cover.jpg in all folders...');
         const { blobs: allBlobs } = await list({
           limit: 1000
-        });
-        
+      });
+      
         // Find cover.jpg in any folder
         const coverBlobs = allBlobs.filter(blob => 
           /\.(jpg|jpeg|png|gif|webp)$/i.test(blob.pathname) && 
@@ -117,14 +117,14 @@ app.get('/api/photos', async (req, res) => {
           total: allPhotos.length
         });
       } else {
-        const paginatedPhotos = allPhotos.slice(offset, offset + limit);
-        console.log(`Returning ${paginatedPhotos.length} photos from Vercel Blob, total: ${allPhotos.length}, hasMore: ${offset + limit < allPhotos.length}`);
-        
-        res.json({
-          photos: paginatedPhotos,
-          hasMore: offset + limit < allPhotos.length,
-          total: allPhotos.length
-        });
+      const paginatedPhotos = allPhotos.slice(offset, offset + limit);
+      console.log(`Returning ${paginatedPhotos.length} photos from Vercel Blob, total: ${allPhotos.length}, hasMore: ${offset + limit < allPhotos.length}`);
+      
+      res.json({
+        photos: paginatedPhotos,
+        hasMore: offset + limit < allPhotos.length,
+        total: allPhotos.length
+      });
       }
     } else {
       // Fallback to static photos if Vercel Blob not configured
@@ -144,19 +144,19 @@ app.get('/api/photos', async (req, res) => {
       } else {
         // Default photo-gallery collection
         allPhotos = [
-          { id: 0, src: '/images/724-10.JPG', alt: '724-10', thumbnail: '/images/724-10.JPG' },
-          { id: 1, src: '/images/724-56.JPG', alt: '724-56', thumbnail: '/images/724-56.JPG' },
-          { id: 2, src: '/images/724-62.JPG', alt: '724-62', thumbnail: '/images/724-62.JPG' },
-          { id: 3, src: '/images/724-70.JPG', alt: '724-70', thumbnail: '/images/724-70.JPG' },
-          { id: 4, src: '/images/84190002.JPG', alt: '84190002', thumbnail: '/images/84190002.JPG' },
-          { id: 5, src: '/images/84190003.JPG', alt: '84190003', thumbnail: '/images/84190003.JPG' },
-          { id: 6, src: '/images/84190004.JPG', alt: '84190004', thumbnail: '/images/84190004.JPG' },
-          { id: 7, src: '/images/84190006.JPG', alt: '84190006', thumbnail: '/images/84190006.JPG' },
-          { id: 8, src: '/images/84190007.JPG', alt: '84190007', thumbnail: '/images/84190007.JPG' },
-          { id: 9, src: '/images/84190010.JPG', alt: '84190010', thumbnail: '/images/84190010.JPG' },
-          { id: 10, src: '/images/84190014.JPG', alt: '84190014', thumbnail: '/images/84190014.JPG' },
-          { id: 11, src: '/images/84190016.JPG', alt: '84190016', thumbnail: '/images/84190016.JPG' }
-        ];
+        { id: 0, src: '/images/724-10.JPG', alt: '724-10', thumbnail: '/images/724-10.JPG' },
+        { id: 1, src: '/images/724-56.JPG', alt: '724-56', thumbnail: '/images/724-56.JPG' },
+        { id: 2, src: '/images/724-62.JPG', alt: '724-62', thumbnail: '/images/724-62.JPG' },
+        { id: 3, src: '/images/724-70.JPG', alt: '724-70', thumbnail: '/images/724-70.JPG' },
+        { id: 4, src: '/images/84190002.JPG', alt: '84190002', thumbnail: '/images/84190002.JPG' },
+        { id: 5, src: '/images/84190003.JPG', alt: '84190003', thumbnail: '/images/84190003.JPG' },
+        { id: 6, src: '/images/84190004.JPG', alt: '84190004', thumbnail: '/images/84190004.JPG' },
+        { id: 7, src: '/images/84190006.JPG', alt: '84190006', thumbnail: '/images/84190006.JPG' },
+        { id: 8, src: '/images/84190007.JPG', alt: '84190007', thumbnail: '/images/84190007.JPG' },
+        { id: 9, src: '/images/84190010.JPG', alt: '84190010', thumbnail: '/images/84190010.JPG' },
+        { id: 10, src: '/images/84190014.JPG', alt: '84190014', thumbnail: '/images/84190014.JPG' },
+        { id: 11, src: '/images/84190016.JPG', alt: '84190016', thumbnail: '/images/84190016.JPG' }
+      ];
       }
       
       const paginatedPhotos = allPhotos.slice(offset, offset + limit);
