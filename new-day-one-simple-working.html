@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Day One - Simple Working</title>
+    <link rel="icon" type="image/png" href="icons/wenlanbo.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            background: rgba(0,0,0,0.7);
+            padding: 1rem;
+            border-radius: 25px;
+        }
+
+        .btn {
+            background: white;
+            border: none;
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #f0f0f0;
+        }
+
+        .counter {
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+        }
+
+        .back-btn {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .status {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
+            max-width: 300px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="title">New Day One</h1>
+        <p class="subtitle">Simple Working Version</p>
+    </header>
+
+    <main class="main">
+        <div class="slideshow-container" id="slideshow">
+            <div class="loading" id="loading">Loading slideshow...</div>
+        </div>
+    </main>
+
+    <div class="back-link">
+        <a href="index.html" class="back-btn">← Back to Gallery</a>
+    </div>
+
+    <div class="status" id="status">Loading...</div>
+
+    <script>
+        // Simple slideshow with guaranteed working images
+        const images = [
+            'https://picsum.photos/800/600?random=1',
+            'https://picsum.photos/800/600?random=2',
+            'https://picsum.photos/800/600?random=3',
+            'https://picsum.photos/800/600?random=4',
+            'https://picsum.photos/800/600?random=5',
+            'https://picsum.photos/800/600?random=6'
+        ];
+
+        let currentSlide = 0;
+        let autoPlayInterval = null;
+        let slides = [];
+
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+            console.log('Status:', message);
+        }
+
+        function createSlides() {
+            updateStatus('Creating slides...');
+            const slideshow = document.getElementById('slideshow');
+            slideshow.innerHTML = '';
+
+            images.forEach((src, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                slide.id = `slide${index}`;
+
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `Slide ${index + 1}`;
+
+                img.onload = () => {
+                    updateStatus(`Image ${index + 1} loaded`);
+                };
+
+                img.onerror = () => {
+                    updateStatus(`Image ${index + 1} failed`);
+                };
+
+                slide.appendChild(img);
+                slideshow.appendChild(slide);
+                slides.push(slide);
+            });
+
+            updateStatus(`Created ${slides.length} slides`);
+        }
+
+        function showSlide(index) {
+            updateStatus(`Showing slide ${index + 1}`);
+            
+            // Hide all slides
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+            });
+            
+            // Show current slide
+            slides[index].classList.add('active');
+            
+            currentSlide = index;
+            updateCounter();
+        }
+
+        function nextSlide() {
+            let next = currentSlide + 1;
+            if (next >= slides.length) {
+                next = 0;
+            }
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            let prev = currentSlide - 1;
+            if (prev < 0) {
+                prev = slides.length - 1;
+            }
+            showSlide(prev);
+        }
+
+        function updateCounter() {
+            const counter = document.querySelector('.counter');
+            if (counter) {
+                counter.innerHTML = `<span id="current">${currentSlide + 1}</span> / <span id="total">${slides.length}</span>`;
+            }
+        }
+
+        function startAutoPlay() {
+            stopAutoPlay();
+            autoPlayInterval = setInterval(nextSlide, 3000);
+            updateStatus('Auto-play started');
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            updateStatus('Auto-play stopped');
+        }
+
+        function togglePlay() {
+            if (autoPlayInterval) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        }
+
+        function createControls() {
+            const controls = document.createElement('div');
+            controls.className = 'controls';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'btn';
+            prevBtn.textContent = '←';
+            prevBtn.onclick = () => {
+                stopAutoPlay();
+                prevSlide();
+            };
+
+            const counter = document.createElement('div');
+            counter.className = 'counter';
+            counter.innerHTML = '<span id="current">1</span> / <span id="total">' + slides.length + '</span>';
+
+            const playBtn = document.createElement('button');
+            playBtn.className = 'btn';
+            playBtn.textContent = '⏸';
+            playBtn.onclick = () => {
+                togglePlay();
+                playBtn.textContent = autoPlayInterval ? '⏸' : '▶';
+            };
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn';
+            nextBtn.textContent = '→';
+            nextBtn.onclick = () => {
+                stopAutoPlay();
+                nextSlide();
+            };
+
+            controls.appendChild(prevBtn);
+            controls.appendChild(counter);
+            controls.appendChild(playBtn);
+            controls.appendChild(nextBtn);
+
+            document.getElementById('slideshow').appendChild(controls);
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus('Page loaded, initializing...');
+            createSlides();
+            createControls();
+            showSlide(0);
+            hideLoading();
+            
+            // Start auto-play after 2 seconds
+            setTimeout(() => {
+                startAutoPlay();
+            }, 2000);
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    stopAutoPlay();
+                    prevSlide();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    stopAutoPlay();
+                    nextSlide();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    togglePlay();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -70,6 +70,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "new-day-one-simple-working.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "icons/**",
       "use": "@vercel/static"
     },
@@ -130,6 +134,10 @@
     {
       "src": "/new-day-one-working-fixed",
       "dest": "/new-day-one-working-fixed.html"
+    },
+    {
+      "src": "/new-day-one-simple-working",
+      "dest": "/new-day-one-simple-working.html"
     },
     {
       "src": "/images/(.*)",
