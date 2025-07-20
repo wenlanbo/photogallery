@@ -172,7 +172,7 @@
     </div>
 
     <script>
-        // Farcaster Mini App SDK initialization
+        // Farcaster Frame SDK initialization
         let sdk;
         let readyCalled = false;
 
@@ -181,16 +181,21 @@
                 console.log('🔧 Initializing Farcaster Frame SDK...');
                 
                 // Wait for SDK to be available
-                await new Promise(resolve => {
-                    const checkSDK = () => {
-                        if (typeof Frame !== 'undefined') {
-                            resolve();
-                        } else {
-                            setTimeout(checkSDK, 100);
-                        }
-                    };
-                    checkSDK();
-                });
+                let attempts = 0;
+                const maxAttempts = 50; // 5 seconds max
+                
+                while (attempts < maxAttempts) {
+                    if (typeof Frame !== 'undefined') {
+                        console.log('✅ Frame SDK found');
+                        break;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                if (typeof Frame === 'undefined') {
+                    throw new Error('Frame SDK not loaded after 5 seconds');
+                }
 
                 // Initialize the SDK
                 sdk = new Frame({
@@ -201,10 +206,12 @@
                     },
                 });
 
-                console.log('✅ Farcaster Frame SDK initialized');
+                console.log('✅ Farcaster Frame SDK initialized successfully');
+                return true;
                 
             } catch (error) {
                 console.error('❌ Error initializing SDK:', error);
+                return false;
             }
         }
 
@@ -212,29 +219,31 @@
             if (readyCalled) return;
             
             try {
-                console.log('🚀 Calling sdk.actions.ready()...');
+                console.log('🚀 Attempting to call ready()...');
                 
+                // Try multiple methods to call ready()
                 if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+                    console.log('✅ Using sdk.actions.ready()');
                     await sdk.actions.ready();
                     console.log('✅ sdk.actions.ready() called successfully');
-                    readyCalled = true;
+                } else if (window.farcaster && window.farcaster.ready) {
+                    console.log('✅ Using window.farcaster.ready()');
+                    await window.farcaster.ready();
+                    console.log('✅ window.farcaster.ready() called successfully');
+                } else if (window.parent && window.parent.postMessage) {
+                    console.log('✅ Using postMessage to parent');
+                    window.parent.postMessage({ type: 'ready' }, '*');
+                    console.log('✅ postMessage ready sent');
+                } else if (typeof ready === 'function') {
+                    console.log('✅ Using direct ready() function');
+                    await ready();
+                    console.log('✅ Direct ready() called successfully');
                 } else {
-                    console.log('⚠️ SDK not available, trying alternative methods...');
-                    
-                    // Try alternative methods
-                    if (window.farcaster && window.farcaster.ready) {
-                        await window.farcaster.ready();
-                        console.log('✅ window.farcaster.ready() called');
-                        readyCalled = true;
-                    } else if (window.parent && window.parent.postMessage) {
-                        window.parent.postMessage({ type: 'ready' }, '*');
-                        console.log('✅ postMessage ready sent');
-                        readyCalled = true;
-                    } else {
-                        console.log('❌ No ready methods available');
-                        readyCalled = true; // Prevent infinite retries
-                    }
+                    console.log('⚠️ No ready methods available');
                 }
+                
+                readyCalled = true;
+                console.log('🎉 Ready called - splash screen should be removed');
                 
             } catch (error) {
                 console.error('❌ Error calling ready():', error);
@@ -419,7 +428,11 @@
             
             try {
                 // Initialize Farcaster SDK first
-                await initializeFarcasterSDK();
+                const sdkInitialized = await initializeFarcasterSDK();
+                
+                if (!sdkInitialized) {
+                    console.log('⚠️ SDK initialization failed, continuing without SDK');
+                }
                 
                 // Load images and create slideshow
                 await loadImagesFromAPI();
