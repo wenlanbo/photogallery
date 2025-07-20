@@ -197,7 +197,7 @@ export default function handler(req, res) {
                 if (!response.ok) {
                     throw new Error(\`API failed: \${response.status}\`);
                 }
-                
+                await sdk.actions.ready();
                 const data = await response.json();
                 const apiImages = data.photos || [];
                 
@@ -243,7 +243,7 @@ export default function handler(req, res) {
             updateStatus('Creating slides...');
             const slideshow = document.getElementById('slideshow');
             slideshow.innerHTML = '';
-            await sdk.actions.ready();
+
             images.forEach((src, index) => {
                 const slide = document.createElement('div');
                 slide.className = 'slide';
