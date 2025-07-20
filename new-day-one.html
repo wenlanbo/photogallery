@@ -360,7 +360,6 @@
             prevBtn.className = 'btn';
             prevBtn.textContent = '←';
             prevBtn.onclick = () => {
-                stopAutoPlay();
                 prevSlide();
             };
 
@@ -368,25 +367,15 @@
             counter.className = 'counter';
             counter.innerHTML = '<span id="current">1</span> / <span id="total">' + slides.length + '</span>';
 
-            const playBtn = document.createElement('button');
-            playBtn.className = 'btn';
-            playBtn.textContent = '⏸';
-            playBtn.onclick = () => {
-                togglePlay();
-                playBtn.textContent = autoPlayInterval ? '⏸' : '▶';
-            };
-
             const nextBtn = document.createElement('button');
             nextBtn.className = 'btn';
             nextBtn.textContent = '→';
             nextBtn.onclick = () => {
-                stopAutoPlay();
                 nextSlide();
             };
 
             controls.appendChild(prevBtn);
             controls.appendChild(counter);
-            controls.appendChild(playBtn);
             controls.appendChild(nextBtn);
 
             document.getElementById('slideshow').appendChild(controls);
@@ -405,10 +394,8 @@
             showSlide(0);
             hideLoading();
             
-            // Start auto-play after 2 seconds
-            setTimeout(() => {
-                startAutoPlay();
-            }, 2000);
+            // Start auto-play immediately
+            startAutoPlay();
         });
 
         // Keyboard controls
@@ -416,17 +403,11 @@
             switch(e.key) {
                 case 'ArrowLeft':
                     e.preventDefault();
-                    stopAutoPlay();
                     prevSlide();
                     break;
                 case 'ArrowRight':
                     e.preventDefault();
-                    stopAutoPlay();
                     nextSlide();
-                    break;
-                case ' ':
-                    e.preventDefault();
-                    togglePlay();
                     break;
             }
         });
