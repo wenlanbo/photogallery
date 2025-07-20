@@ -313,6 +313,39 @@
             }
         }
 
+        // Load cover image immediately
+        function loadCoverImage() {
+            log('🖼️ Loading cover image immediately...');
+            
+            const slideshow = document.getElementById('slideshow');
+            slideshow.innerHTML = `
+                <div class="slide active" id="cover-slide">
+                    <img src="/images/cover.jpg" alt="Cover" id="cover-image" />
+                </div>
+            `;
+            
+            const coverImage = document.getElementById('cover-image');
+            
+            coverImage.onload = () => {
+                log('✅ Cover image loaded, calling ready() immediately');
+                callReady();
+            };
+            
+            coverImage.onerror = () => {
+                log('❌ Cover image failed, trying fallback...');
+                // Try a different cover image or call ready anyway
+                coverImage.src = '/images/L1000031.JPG';
+                coverImage.onload = () => {
+                    log('✅ Fallback cover image loaded, calling ready()');
+                    callReady();
+                };
+                coverImage.onerror = () => {
+                    log('❌ All cover images failed, calling ready() anyway');
+                    callReady();
+                };
+            };
+        }
+
         async function loadImagesFromAPI() {
             try {
                 log('📸 Loading images from API...');
@@ -379,22 +412,10 @@
 
                 img.onload = () => {
                     log(`✅ Image ${index + 1} loaded: ${src}`);
-                    
-                    // Call ready() when first image loads
-                    if (index === 0) {
-                        log('🎯 First image loaded, calling ready()');
-                        callReady();
-                    }
                 };
 
                 img.onerror = () => {
                     log(`❌ Image ${index + 1} failed: ${src}`);
-                    
-                    // Call ready() even if first image fails
-                    if (index === 0) {
-                        log('🎯 First image failed, calling ready() anyway');
-                        callReady();
-                    }
                 };
 
                 slide.appendChild(img);
@@ -514,17 +535,19 @@
         document.addEventListener('DOMContentLoaded', async () => {
             log('🚀 Mini App loaded, initializing...');
             
+            // Load cover image immediately for fast startup
+            loadCoverImage();
+            
             try {
-                // Load images first
+                // Load images in background
                 await loadImagesFromAPI();
                 
                 if (images.length === 0) {
-                    showError('No images available');
-                    await callReady(); // Still call ready even if no images
+                    log('⚠️ No images available, keeping cover image');
                     return;
                 }
                 
-                // Create slideshow
+                // Replace cover with full slideshow
                 createSlides();
                 createControls();
                 showSlide(0);
@@ -535,12 +558,11 @@
                     startAutoPlay();
                 }, 1000);
                 
-                log('✅ Initialization complete');
+                log('✅ Full slideshow loaded');
                 
             } catch (error) {
-                log(`❌ Initialization failed: ${error.message}`);
-                showError('Failed to load slideshow');
-                await callReady(); // Still call ready even if initialization fails
+                log(`❌ Full slideshow failed: ${error.message}`);
+                // Keep the cover image if slideshow fails
             }
         });
 
