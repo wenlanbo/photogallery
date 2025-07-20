@@ -6,11 +6,13 @@
 }
 
 body {
-    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-    line-height: 1.6;
-    color: #333;
+    font-family: 'Inter', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    line-height: 1.5;
+    color: #1a1a1a;
     background: #ffffff;
     min-height: 100vh;
+    font-weight: 400;
+    letter-spacing: -0.01em;
 }
 
 .container {
@@ -21,27 +23,31 @@ body {
 
 /* Header styles */
 .header {
-    background: #f8f9fa;
-    padding: 2rem 0;
+    background: #fafafa;
+    padding: 2.5rem 0;
     text-align: center;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .title {
-    font-family: 'Inter', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-    font-size: 3.5rem;
-    font-weight: 600;
-    color: #2c3e50;
+    font-family: 'Inter', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 500;
+    color: #0f0f0f;
     margin-bottom: 0.5rem;
-    letter-spacing: 0.02em;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    font-feature-settings: 'liga' 1, 'kern' 1;
 }
 
 .subtitle {
-    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-    font-size: 1.4rem;
-    color: #6c757d;
-    font-weight: 400;
-    letter-spacing: 0.05em;
+    font-family: 'Inter', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-size: 1.1rem;
+    color: #666666;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-feature-settings: 'liga' 1, 'kern' 1;
 }
 
 /* Main content */
@@ -106,7 +112,12 @@ body {
 .loading {
     text-align: center;
     padding: 2rem;
-    color: #6c757d;
+    color: #666666;
+    font-family: 'Inter', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-size: 0.9rem;
 }
 
 .spinner {
@@ -267,11 +278,13 @@ body {
 
 @media (max-width: 768px) {
     .title {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
+        letter-spacing: -0.01em;
     }
     
     .subtitle {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
     }
     
     .gallery {
@@ -324,11 +337,13 @@ body {
     }
     
     .title {
-        font-size: 2rem;
+        font-size: 1.8rem;
+        letter-spacing: -0.005em;
     }
     
     .subtitle {
-        font-size: 1.1rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
     }
     
     /* Small screen improvements */
