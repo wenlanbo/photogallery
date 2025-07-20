@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Cover Images</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .cover-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .cover-item img {
+            max-width: 200px;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .pathname {
+            font-family: monospace;
+            background: #f5f5f5;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        button {
+            background: #0f0f0f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Cover Images in Vercel Blob</h1>
+    <button onclick="searchCovers()">Search for Cover Images</button>
+    <div id="results"></div>
+
+    <script>
+        async function searchCovers() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Searching...</p>';
+            
+            try {
+                const response = await fetch('/api/search-covers');
+                const data = await response.json();
+                
+                console.log('Search results:', data);
+                
+                if (data.covers && data.covers.length > 0) {
+                    resultsDiv.innerHTML = `
+                        <h2>Found ${data.covers.length} cover images:</h2>
+                        ${data.covers.map(cover => `
+                            <div class="cover-item">
+                                <h3>${cover.alt}</h3>
+                                <img src="${cover.src}" alt="${cover.alt}" />
+                                <p><strong>Path:</strong> <span class="pathname">${cover.pathname}</span></p>
+                                <p><strong>Size:</strong> ${(cover.size / 1024 / 1024).toFixed(2)} MB</p>
+                                <p><strong>Created:</strong> ${new Date(cover.createdTime).toLocaleString()}</p>
+                            </div>
+                        `).join('')}
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <h2>No cover images found</h2>
+                        <p>${data.message || 'No cover images were found in Vercel Blob.'}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error searching covers:', error);
+                resultsDiv.innerHTML = `
+                    <h2>Error</h2>
+                    <p>Failed to search for cover images: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Auto-search on page load
+        document.addEventListener('DOMContentLoaded', searchCovers);
+    </script>
+</body>
+</html> 

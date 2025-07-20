@@ -38,6 +38,55 @@ app.get('/api/photos', async (req, res) => {
         prefix: `${folder}/`
       });
       
+      console.log(`Found ${blobs.length} blobs in ${folder}/`);
+      
+      // If no blobs found in specific folder, search for cover.jpg in all folders
+      if (blobs.length === 0 && folder === 'new-day-one') {
+        console.log('No blobs found in new-day-one folder, searching for cover.jpg in all folders...');
+        const { blobs: allBlobs } = await list({
+          limit: 1000
+        });
+        
+        // Find cover.jpg in any folder
+        const coverBlobs = allBlobs.filter(blob => 
+          /\.(jpg|jpeg|png|gif|webp)$/i.test(blob.pathname) && 
+          blob.pathname.toLowerCase().includes('cover')
+        );
+        
+        console.log(`Found ${coverBlobs.length} cover images:`, coverBlobs.map(b => b.pathname));
+        
+        if (coverBlobs.length > 0) {
+          // Use cover images found in any folder
+          const imageBlobs = coverBlobs.concat(
+            allBlobs.filter(blob => 
+              /\.(jpg|jpeg|png|gif|webp)$/i.test(blob.pathname) && 
+              !blob.pathname.toLowerCase().includes('cover')
+            ).slice(0, 9) // Add up to 9 more images
+          );
+          
+          const allPhotos = imageBlobs.map((blob, index) => ({
+            id: index,
+            src: blob.url,
+            alt: blob.pathname.split('/').pop() || `Photo ${index + 1}`,
+            thumbnail: blob.url,
+            name: blob.pathname.split('/').pop(),
+            size: blob.size,
+            createdTime: blob.uploadedAt
+          }));
+          
+          const paginatedPhotos = allPhotos.slice(offset, offset + limit);
+          
+          console.log(`Returning ${paginatedPhotos.length} photos (including covers), total: ${allPhotos.length}`);
+          
+          res.json({
+            photos: paginatedPhotos,
+            hasMore: offset + limit < allPhotos.length,
+            total: allPhotos.length
+          });
+          return;
+        }
+      }
+      
       // Filter for image files and sort with cover.jpg first
       const imageBlobs = blobs
         .filter(blob => /\.(jpg|jpeg|png|gif|webp)$/i.test(blob.pathname))
@@ -116,6 +165,54 @@ app.get('/api/photos', async (req, res) => {
     console.error('Error loading photos:', error);
     res.status(500).json({ 
       error: 'Failed to load photos',
+      details: error.message
+    });
+  }
+});
+
+// API endpoint to search for cover images
+app.get('/api/search-covers', async (req, res) => {
+  try {
+    console.log('Searching for cover images in Vercel Blob...');
+    
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return res.json({ 
+        covers: [],
+        message: 'Vercel Blob not configured'
+      });
+    }
+    
+    // Search all blobs for cover images
+    const { blobs } = await list({
+      limit: 1000
+    });
+    
+    const coverBlobs = blobs.filter(blob => 
+      /\.(jpg|jpeg|png|gif|webp)$/i.test(blob.pathname) && 
+      blob.pathname.toLowerCase().includes('cover')
+    );
+    
+    console.log(`Found ${coverBlobs.length} cover images:`, coverBlobs.map(b => b.pathname));
+    
+    const covers = coverBlobs.map((blob, index) => ({
+      id: index,
+      src: blob.url,
+      alt: blob.pathname.split('/').pop() || `Cover ${index + 1}`,
+      pathname: blob.pathname,
+      size: blob.size,
+      createdTime: blob.uploadedAt
+    }));
+    
+    res.json({
+      covers,
+      total: covers.length,
+      message: `Found ${covers.length} cover images`
+    });
+    
+  } catch (error) {
+    console.error('Error searching for covers:', error);
+    res.status(500).json({ 
+      error: 'Failed to search for cover images',
       details: error.message
     });
   }

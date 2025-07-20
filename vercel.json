@@ -34,6 +34,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "search-covers.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "icons/**",
       "use": "@vercel/static"
     },
@@ -58,6 +62,10 @@
     {
       "src": "/new-day-one-test",
       "dest": "/new-day-one-test.html"
+    },
+    {
+      "src": "/search-covers",
+      "dest": "/search-covers.html"
     },
     {
       "src": "/icons/(.*)",

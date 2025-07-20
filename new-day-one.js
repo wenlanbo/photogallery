@@ -31,6 +31,12 @@ class CardDeckExperience {
         try {
             console.log('Attempting to load photos from API...');
             
+            // First, try to search for cover images
+            console.log('Searching for cover images...');
+            const coverResponse = await fetch('/api/search-covers');
+            const coverData = await coverResponse.json();
+            console.log('Cover search result:', coverData);
+            
             // Load photos from the /new-day-one folder in Vercel Blob
             const response = await fetch('/api/photos?folder=new-day-one');
             console.log('API Response status:', response.status);
@@ -44,6 +50,15 @@ class CardDeckExperience {
             
             this.photos = data.photos || [];
             console.log('Photos loaded:', this.photos.length);
+            
+            // If no photos found but we have cover images, use them
+            if (this.photos.length === 0 && coverData.covers && coverData.covers.length > 0) {
+                console.log('No photos in new-day-one folder, but found cover images. Using covers...');
+                this.photos = coverData.covers;
+                this.createCards();
+                this.hideLoading();
+                return;
+            }
             
             // If no photos found, show a message
             if (this.photos.length === 0) {
