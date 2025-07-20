@@ -11,9 +11,6 @@
     <meta property="fc:frame:button:1" content="View Slideshow" />
     <meta property="fc:frame:post_url" content="https://w.enlan.bo/api/frame" />
     
-    <!-- Farcaster Mini App SDK -->
-    <script src="https://unpkg.com/@farcaster/frame-js@0.0.8/dist/index.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -164,7 +161,7 @@
     </header>
 
     <div class="farcaster-info">
-        📸 Farcaster Mini App
+        📸 Farcaster Frame
     </div>
 
     <div class="slideshow-container" id="slideshow">
@@ -172,74 +169,37 @@
     </div>
 
     <script>
-        // Farcaster Frame SDK initialization
-        let sdk;
+        // Simple Farcaster Frame ready() call
         let readyCalled = false;
 
-        async function initializeFarcasterSDK() {
-            try {
-                console.log('🔧 Initializing Farcaster Frame SDK...');
-                
-                // Wait for SDK to be available
-                let attempts = 0;
-                const maxAttempts = 50; // 5 seconds max
-                
-                while (attempts < maxAttempts) {
-                    if (typeof Frame !== 'undefined') {
-                        console.log('✅ Frame SDK found');
-                        break;
-                    }
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    attempts++;
-                }
-                
-                if (typeof Frame === 'undefined') {
-                    throw new Error('Frame SDK not loaded after 5 seconds');
-                }
-
-                // Initialize the SDK
-                sdk = new Frame({
-                    frameUrl: window.location.href,
-                    frameData: {
-                        fid: 302199,
-                        network: 1,
-                    },
-                });
-
-                console.log('✅ Farcaster Frame SDK initialized successfully');
-                return true;
-                
-            } catch (error) {
-                console.error('❌ Error initializing SDK:', error);
-                return false;
-            }
-        }
-
-        async function callReady() {
+        function callReady() {
             if (readyCalled) return;
             
+            console.log('🚀 Calling ready() to remove splash screen...');
+            
             try {
-                console.log('🚀 Attempting to call ready()...');
-                
-                // Try multiple methods to call ready()
-                if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
-                    console.log('✅ Using sdk.actions.ready()');
-                    await sdk.actions.ready();
-                    console.log('✅ sdk.actions.ready() called successfully');
-                } else if (window.farcaster && window.farcaster.ready) {
-                    console.log('✅ Using window.farcaster.ready()');
-                    await window.farcaster.ready();
-                    console.log('✅ window.farcaster.ready() called successfully');
-                } else if (window.parent && window.parent.postMessage) {
-                    console.log('✅ Using postMessage to parent');
+                // Method 1: Try global ready function (primary method)
+                if (typeof ready === 'function') {
+                    ready();
+                    console.log('✅ Global ready() function called');
+                }
+                // Method 2: Try window.farcaster.ready
+                else if (window.farcaster && window.farcaster.ready) {
+                    window.farcaster.ready();
+                    console.log('✅ window.farcaster.ready() called');
+                }
+                // Method 3: Try postMessage to parent
+                else if (window.parent && window.parent.postMessage) {
                     window.parent.postMessage({ type: 'ready' }, '*');
-                    console.log('✅ postMessage ready sent');
-                } else if (typeof ready === 'function') {
-                    console.log('✅ Using direct ready() function');
-                    await ready();
-                    console.log('✅ Direct ready() called successfully');
-                } else {
-                    console.log('⚠️ No ready methods available');
+                    console.log('✅ postMessage ready sent to parent');
+                }
+                // Method 4: Try sdk.actions.ready if available
+                else if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
+                    window.sdk.actions.ready();
+                    console.log('✅ window.sdk.actions.ready() called');
+                }
+                else {
+                    console.log('⚠️ No ready methods found, but continuing...');
                 }
                 
                 readyCalled = true;
@@ -427,13 +387,6 @@
             console.log('🚀 Frame loaded, initializing...');
             
             try {
-                // Initialize Farcaster SDK first
-                const sdkInitialized = await initializeFarcasterSDK();
-                
-                if (!sdkInitialized) {
-                    console.log('⚠️ SDK initialization failed, continuing without SDK');
-                }
-                
                 // Load images and create slideshow
                 await loadImagesFromAPI();
                 createSlides();
