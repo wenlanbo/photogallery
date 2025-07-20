@@ -113,15 +113,27 @@ body {
     z-index: 5;
 }
 
-/* Ensure all cards are visible for debugging */
+/* Simplified card deck for now - show all cards stacked */
 .card {
+    position: relative !important;
+    margin: 10px 0 !important;
     opacity: 1 !important;
-    transform: translateX(0) rotateY(0deg) !important;
-    z-index: 1;
+    transform: none !important;
+    z-index: 1 !important;
+    height: auto !important;
+    min-height: 200px;
 }
 
-.card.active {
-    z-index: 10;
+.card-deck {
+    height: auto !important;
+    min-height: 600px;
+}
+
+.card img {
+    max-width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
 }
 
 .card img {

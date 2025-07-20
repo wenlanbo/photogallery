@@ -177,16 +177,10 @@ class CardDeckExperience {
     showCurrentCard() {
         const cards = this.cardDeck.querySelectorAll('.card');
         
+        // For now, show all cards since we're using simplified layout
         cards.forEach((card, index) => {
             card.classList.remove('active', 'prev', 'next');
-            
-            if (index === this.currentIndex) {
-                card.classList.add('active');
-            } else if (index === this.currentIndex - 1) {
-                card.classList.add('prev');
-            } else if (index === this.currentIndex + 1) {
-                card.classList.add('next');
-            }
+            card.classList.add('active'); // Show all cards
         });
         
         this.currentIndexSpan.textContent = this.currentIndex + 1;
@@ -208,8 +202,12 @@ class CardDeckExperience {
     }
     
     updateNavigation() {
-        this.prevBtn.disabled = this.currentIndex === 0;
-        this.nextBtn.disabled = this.currentIndex === this.photos.length - 1;
+        // For simplified layout, disable navigation since all cards are visible
+        this.prevBtn.disabled = true;
+        this.nextBtn.disabled = true;
+        
+        // Update counter to show total
+        this.currentIndexSpan.textContent = this.photos.length;
     }
     
     setupEventListeners() {
