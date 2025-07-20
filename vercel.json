@@ -58,6 +58,14 @@
       "use": "@vercel/static"
     },
     {
+      "src": "new-day-one-force-visible.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "test-images.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "icons/**",
       "use": "@vercel/static"
     },
@@ -106,6 +114,14 @@
     {
       "src": "/new-day-one-simple-fixed",
       "dest": "/new-day-one-simple-fixed.html"
+    },
+    {
+      "src": "/new-day-one-force-visible",
+      "dest": "/new-day-one-force-visible.html"
+    },
+    {
+      "src": "/test-images",
+      "dest": "/test-images.html"
     },
     {
       "src": "/icons/(.*)",
