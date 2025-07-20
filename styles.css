@@ -13,6 +13,8 @@ body {
     min-height: 100vh;
     font-weight: 400;
     letter-spacing: -0.01em;
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
@@ -53,6 +55,26 @@ body {
 /* Main content */
 .main {
     padding: 2rem 0;
+    min-height: calc(100vh - 200px); /* Ensure footer stays at bottom */
+}
+
+/* Footer styles */
+.footer {
+    background: #fafafa;
+    border-top: 1px solid #e0e0e0;
+    padding: 1.5rem 0;
+    text-align: center;
+    margin-top: auto;
+}
+
+.copyright {
+    font-family: 'Inter', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.85rem;
+    color: #666666;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin: 0;
 }
 
 /* Gallery grid - Masonry style */
@@ -359,6 +381,14 @@ body {
     .modal-image.vertical {
         max-width: 90vw;
         max-height: 80vh;
+    }
+    
+    .footer {
+        padding: 1rem 0;
+    }
+    
+    .copyright {
+        font-size: 0.75rem;
     }
 }
 
