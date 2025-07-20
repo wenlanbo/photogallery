@@ -542,7 +542,7 @@
                     showError('No images available');
                     return;
                 }
-                
+                await sdk.actions.ready();
                 createSlides();
                 createControls();
                 showSlide(0);
