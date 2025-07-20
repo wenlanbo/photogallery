@@ -132,7 +132,7 @@ class CardDeckExperience {
             
             // Add cover-card class to the first image
             if (index === 0) {
-                card.classList.add('cover-card');
+                card.classList.add('cover-card', 'active');
             }
             
             const img = document.createElement('img');
@@ -147,10 +147,19 @@ class CardDeckExperience {
                 img.src = '/images/724-10.JPG'; // Fallback image
             };
             
+            // Add success handler for images
+            img.onload = () => {
+                console.log(`Image loaded successfully: ${imageSrc}`);
+            };
+            
             console.log(`Creating card ${index + 1}:`, imageSrc);
             
             card.appendChild(img);
             this.cardDeck.appendChild(card);
+            
+            // Force the card to be visible
+            card.style.opacity = '1';
+            card.style.transform = 'translateX(0) rotateY(0deg)';
         });
         
         this.totalCountSpan.textContent = this.photos.length;
@@ -158,6 +167,11 @@ class CardDeckExperience {
         
         // Force a reflow to ensure cards are visible
         this.cardDeck.offsetHeight;
+        
+        // Show the first card immediately
+        setTimeout(() => {
+            this.showCurrentCard();
+        }, 100);
     }
     
     showCurrentCard() {

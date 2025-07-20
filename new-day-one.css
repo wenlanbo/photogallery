@@ -69,6 +69,8 @@ body {
     max-width: 800px;
     height: 600px;
     perspective: 1000px;
+    border: 2px solid #e0e0e0; /* Debug border */
+    background: #f9f9f9; /* Debug background */
 }
 
 .card {
@@ -85,6 +87,7 @@ body {
     cursor: pointer;
     opacity: 0;
     transform: translateX(100%) rotateY(10deg);
+    border: 1px solid #ccc; /* Debug border */
 }
 
 .card.active {
@@ -108,6 +111,17 @@ body {
     opacity: 0.3;
     transform: translateX(100%) rotateY(10deg);
     z-index: 5;
+}
+
+/* Ensure all cards are visible for debugging */
+.card {
+    opacity: 1 !important;
+    transform: translateX(0) rotateY(0deg) !important;
+    z-index: 1;
+}
+
+.card.active {
+    z-index: 10;
 }
 
 .card img {
