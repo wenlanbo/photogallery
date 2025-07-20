@@ -243,7 +243,7 @@ export default function handler(req, res) {
             updateStatus('Creating slides...');
             const slideshow = document.getElementById('slideshow');
             slideshow.innerHTML = '';
-
+            await sdk.actions.ready();
             images.forEach((src, index) => {
                 const slide = document.createElement('div');
                 slide.className = 'slide';
