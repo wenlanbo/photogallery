@@ -26,21 +26,28 @@ app.get('/api/photos', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12;
     const offset = (page - 1) * limit;
+    const folder = req.query.folder || 'photo-gallery';
     
-    console.log(`API called: page=${page}, limit=${limit}, offset=${offset}`);
+    console.log(`API called: page=${page}, limit=${limit}, offset=${offset}, folder=${folder}`);
     
     // Check if Vercel Blob is configured
     if (process.env.BLOB_READ_WRITE_TOKEN) {
       // Get photos from Vercel Blob
       const { blobs } = await list({
         limit: 1000,
-        prefix: 'photo-gallery/'
+        prefix: `${folder}/`
       });
       
-      // Filter for image files and sort by creation date
+      // Filter for image files and sort with cover.jpg first
       const imageBlobs = blobs
         .filter(blob => /\.(jpg|jpeg|png|gif|webp)$/i.test(blob.pathname))
-        .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+        .sort((a, b) => {
+          // Always put cover.jpg first
+          if (a.pathname.toLowerCase().includes('cover.jpg')) return -1;
+          if (b.pathname.toLowerCase().includes('cover.jpg')) return 1;
+          // Then sort by creation date
+          return new Date(b.uploadedAt) - new Date(a.uploadedAt);
+        });
       
       const allPhotos = imageBlobs.map((blob, index) => ({
         id: index,
@@ -63,20 +70,36 @@ app.get('/api/photos', async (req, res) => {
       });
     } else {
       // Fallback to static photos if Vercel Blob not configured
-      const allPhotos = [
-        { id: 0, src: '/images/724-10.JPG', alt: '724-10', thumbnail: '/images/724-10.JPG' },
-        { id: 1, src: '/images/724-56.JPG', alt: '724-56', thumbnail: '/images/724-56.JPG' },
-        { id: 2, src: '/images/724-62.JPG', alt: '724-62', thumbnail: '/images/724-62.JPG' },
-        { id: 3, src: '/images/724-70.JPG', alt: '724-70', thumbnail: '/images/724-70.JPG' },
-        { id: 4, src: '/images/84190002.JPG', alt: '84190002', thumbnail: '/images/84190002.JPG' },
-        { id: 5, src: '/images/84190003.JPG', alt: '84190003', thumbnail: '/images/84190003.JPG' },
-        { id: 6, src: '/images/84190004.JPG', alt: '84190004', thumbnail: '/images/84190004.JPG' },
-        { id: 7, src: '/images/84190006.JPG', alt: '84190006', thumbnail: '/images/84190006.JPG' },
-        { id: 8, src: '/images/84190007.JPG', alt: '84190007', thumbnail: '/images/84190007.JPG' },
-        { id: 9, src: '/images/84190010.JPG', alt: '84190010', thumbnail: '/images/84190010.JPG' },
-        { id: 10, src: '/images/84190014.JPG', alt: '84190014', thumbnail: '/images/84190014.JPG' },
-        { id: 11, src: '/images/84190016.JPG', alt: '84190016', thumbnail: '/images/84190016.JPG' }
-      ];
+      let allPhotos = [];
+      
+      if (folder === 'new-day-one') {
+        // Sample photos for new-day-one collection with cover.jpg first
+        allPhotos = [
+          { id: 0, src: '/images/cover.jpg', alt: 'New Day One - Cover', thumbnail: '/images/cover.jpg' },
+          { id: 1, src: '/images/724-10.JPG', alt: 'New Day One - 1', thumbnail: '/images/724-10.JPG' },
+          { id: 2, src: '/images/724-56.JPG', alt: 'New Day One - 2', thumbnail: '/images/724-56.JPG' },
+          { id: 3, src: '/images/724-62.JPG', alt: 'New Day One - 3', thumbnail: '/images/724-62.JPG' },
+          { id: 4, src: '/images/724-70.JPG', alt: 'New Day One - 4', thumbnail: '/images/724-70.JPG' },
+          { id: 5, src: '/images/84190002.JPG', alt: 'New Day One - 5', thumbnail: '/images/84190002.JPG' },
+          { id: 6, src: '/images/84190003.JPG', alt: 'New Day One - 6', thumbnail: '/images/84190003.JPG' }
+        ];
+      } else {
+        // Default photo-gallery collection
+        allPhotos = [
+          { id: 0, src: '/images/724-10.JPG', alt: '724-10', thumbnail: '/images/724-10.JPG' },
+          { id: 1, src: '/images/724-56.JPG', alt: '724-56', thumbnail: '/images/724-56.JPG' },
+          { id: 2, src: '/images/724-62.JPG', alt: '724-62', thumbnail: '/images/724-62.JPG' },
+          { id: 3, src: '/images/724-70.JPG', alt: '724-70', thumbnail: '/images/724-70.JPG' },
+          { id: 4, src: '/images/84190002.JPG', alt: '84190002', thumbnail: '/images/84190002.JPG' },
+          { id: 5, src: '/images/84190003.JPG', alt: '84190003', thumbnail: '/images/84190003.JPG' },
+          { id: 6, src: '/images/84190004.JPG', alt: '84190004', thumbnail: '/images/84190004.JPG' },
+          { id: 7, src: '/images/84190006.JPG', alt: '84190006', thumbnail: '/images/84190006.JPG' },
+          { id: 8, src: '/images/84190007.JPG', alt: '84190007', thumbnail: '/images/84190007.JPG' },
+          { id: 9, src: '/images/84190010.JPG', alt: '84190010', thumbnail: '/images/84190010.JPG' },
+          { id: 10, src: '/images/84190014.JPG', alt: '84190014', thumbnail: '/images/84190014.JPG' },
+          { id: 11, src: '/images/84190016.JPG', alt: '84190016', thumbnail: '/images/84190016.JPG' }
+        ];
+      }
       
       const paginatedPhotos = allPhotos.slice(offset, offset + limit);
       

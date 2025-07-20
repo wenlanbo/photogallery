@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Day One - A Film Experience</title>
+    <link rel="icon" type="image/png" href="icons/wenlanbo.png">
+    <link rel="shortcut icon" type="image/png" href="icons/wenlanbo.png">
+    <link rel="apple-touch-icon" href="icons/wenlanbo.png">
+    <link rel="stylesheet" href="new-day-one.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="title">New Day One</h1>
+            <p class="subtitle">A Film Experience</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="card-deck" id="cardDeck">
+                <!-- Photos will be dynamically loaded here as cards -->
+            </div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading Film Experience...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Navigation controls -->
+    <div class="navigation" id="navigation">
+        <button class="nav-btn prev-btn" id="prevBtn">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="counter" id="counter">
+            <span id="currentIndex">1</span> / <span id="totalCount">0</span>
+        </div>
+        <button class="nav-btn next-btn" id="nextBtn">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- Back to main gallery -->
+    <div class="back-link">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Gallery</span>
+        </a>
+    </div>
+
+    <!-- Footer with copyright -->
+    <footer class="footer">
+        <div class="container">
+            <p class="copyright">© 2024 Wenlanbo. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="new-day-one.js"></script>
+</body>
+</html> 
