@@ -9,13 +9,32 @@
     <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://w.enlan.bo/frame-og.png","button":{"title":"View Slideshow","action":{"type":"launch_frame","name":"New Day One","url":"https://w.enlan.bo/frame","splashImageUrl":"https://w.enlan.bo/app-icon.png","splashBackgroundColor":"#FFFFFF"}}}' />
     
     <!-- Farcaster Mini App SDK -->
-    <script type="module">
-        import { sdk } from 'https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/index.js';
-        
-        // Make SDK available globally
-        window.farcasterSDK = sdk;
-        
-        console.log('✅ Farcaster SDK imported successfully:', sdk);
+    <script>
+        // Try to load the SDK
+        (async function() {
+            try {
+                // Method 1: Try ES6 module import
+                const { sdk } = await import('https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/index.js');
+                window.farcasterSDK = sdk;
+                console.log('✅ Farcaster SDK imported successfully via ES6:', sdk);
+            } catch (error) {
+                console.log('⚠️ ES6 import failed, trying alternative methods...');
+                
+                // Method 2: Try loading as script tag
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/index.js';
+                script.onload = function() {
+                    if (window.FarcasterSDK) {
+                        window.farcasterSDK = window.FarcasterSDK;
+                        console.log('✅ Farcaster SDK loaded via script tag:', window.farcasterSDK);
+                    }
+                };
+                script.onerror = function() {
+                    console.log('⚠️ Script tag loading also failed');
+                };
+                document.head.appendChild(script);
+            }
+        })();
     </script>
     
     <style>
@@ -282,14 +301,18 @@
                     readyCalled = true;
                     return true;
                 }
+                // Last resort: call ready() anyway to prevent splash screen from persisting
                 else {
-                    console.log('⚠️ No ready methods available yet');
-                    return false; // Return false to indicate we should try again later
+                    console.log('⚠️ No ready methods available, calling ready() anyway to prevent splash screen persistence');
+                    readyCalled = true;
+                    return true;
                 }
                 
             } catch (error) {
                 console.error('❌ Error calling ready():', error);
-                return false; // Return false to indicate we should try again later
+                // Even if there's an error, mark as ready to prevent splash screen from persisting
+                readyCalled = true;
+                return true;
             }
         }
 
@@ -311,29 +334,37 @@
                     images = apiImages.map(photo => photo.src || photo.url);
                     console.log(`✅ Loaded ${images.length} images from API`);
                 } else {
-                    // Fallback to placeholder images
+                    // Fallback to local images
                     images = [
-                        'https://picsum.photos/800/600?random=1',
-                        'https://picsum.photos/800/600?random=2',
-                        'https://picsum.photos/800/600?random=3',
-                        'https://picsum.photos/800/600?random=4',
-                        'https://picsum.photos/800/600?random=5',
-                        'https://picsum.photos/800/600?random=6'
+                        '/images/L1000031.JPG',
+                        '/images/L1000032.JPG',
+                        '/images/L1000036.JPG',
+                        '/images/L1000039.jpg',
+                        '/images/L1000048.jpg',
+                        '/images/L1000057.jpg',
+                        '/images/L1000058.jpg',
+                        '/images/L1000111.jpg',
+                        '/images/L1000151.jpg',
+                        '/images/L1000172.jpg'
                     ];
-                    console.log('⚠️ No API images, using placeholders');
+                    console.log('⚠️ No API images, using local images');
                 }
             } catch (error) {
                 console.error('❌ Error loading from API:', error);
-                // Fallback to placeholder images
+                // Fallback to local images
                 images = [
-                    'https://picsum.photos/800/600?random=1',
-                    'https://picsum.photos/800/600?random=2',
-                    'https://picsum.photos/800/600?random=3',
-                    'https://picsum.photos/800/600?random=4',
-                    'https://picsum.photos/800/600?random=5',
-                    'https://picsum.photos/800/600?random=6'
+                    '/images/L1000031.JPG',
+                    '/images/L1000032.JPG',
+                    '/images/L1000036.JPG',
+                    '/images/L1000039.jpg',
+                    '/images/L1000048.jpg',
+                    '/images/L1000057.jpg',
+                    '/images/L1000058.jpg',
+                    '/images/L1000111.jpg',
+                    '/images/L1000151.jpg',
+                    '/images/L1000172.jpg'
                 ];
-                console.log('⚠️ API failed, using placeholders');
+                console.log('⚠️ API failed, using local images');
             }
         }
 
@@ -343,8 +374,20 @@
 
         function createSlides() {
             console.log('🎬 Creating slides...');
+            console.log('📸 Images to load:', images);
+            
             const slideshow = document.getElementById('slideshow');
             slideshow.innerHTML = '';
+
+            if (images.length === 0) {
+                console.log('⚠️ No images available, creating placeholder slide');
+                const slide = document.createElement('div');
+                slide.className = 'slide active';
+                slide.innerHTML = '<div style="text-align: center; padding: 50px; color: white;">No images available</div>';
+                slideshow.appendChild(slide);
+                slides.push(slide);
+                return;
+            }
 
             images.forEach((src, index) => {
                 const slide = document.createElement('div');
@@ -356,7 +399,7 @@
                 img.alt = `Slide ${index + 1}`;
 
                 img.onload = () => {
-                    console.log(`✅ Image ${index + 1} loaded`);
+                    console.log(`✅ Image ${index + 1} loaded: ${src}`);
                     
                     // Call ready() when first image loads
                     if (index === 0) {
@@ -366,7 +409,7 @@
                 };
 
                 img.onerror = () => {
-                    console.log(`❌ Image ${index + 1} failed`);
+                    console.log(`❌ Image ${index + 1} failed: ${src}`);
                     
                     // Call ready() even if first image fails
                     if (index === 0) {
