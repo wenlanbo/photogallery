@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>New Day One - A Film Experience</title>
     <link rel="icon" type="image/png" href="icons/wenlanbo.png">
     <link rel="shortcut icon" type="image/png" href="icons/wenlanbo.png">
@@ -18,31 +18,36 @@
 
         body {
             font-family: 'Inter', 'Roboto', sans-serif;
-            background: #f5f5f5;
+            background: #000;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .header {
-            background: white;
-            padding: 2rem;
+            background: rgba(0,0,0,0.8);
+            padding: 1rem;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
         }
 
         .title {
-            font-size: 2.5rem;
-            color: #333;
-            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 0.25rem;
             font-weight: 500;
             letter-spacing: -0.02em;
             text-transform: uppercase;
         }
 
         .subtitle {
-            color: #666;
-            font-size: 1rem;
+            color: #ccc;
+            font-size: 0.8rem;
             font-weight: 300;
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -54,14 +59,14 @@
             align-items: center;
             justify-content: center;
             padding: 0;
+            margin-top: 80px;
         }
 
         .slideshow-container {
             position: relative;
-            width: 100%;
-            max-width: 100vw;
-            height: 80vh;
-            background: transparent;
+            width: 100vw;
+            height: calc(100vh - 80px);
+            background: #000;
             overflow: hidden;
         }
 
@@ -72,7 +77,7 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.8s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -99,86 +104,185 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 1rem;
-            background: rgba(0,0,0,0.7);
-            padding: 1rem;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.8);
+            padding: 0.75rem;
             border-radius: 25px;
+            backdrop-filter: blur(10px);
         }
 
         .btn {
             background: white;
             border: none;
             color: #333;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.75rem;
             border-radius: 20px;
             cursor: pointer;
             font-size: 0.9rem;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn:hover {
+        .btn:hover, .btn:active {
             background: #f0f0f0;
+            transform: scale(1.05);
         }
 
         .counter {
             color: white;
             display: flex;
             align-items: center;
-            padding: 0 1rem;
-            font-size: 0.9rem;
+            padding: 0 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
         .back-link {
             position: fixed;
             top: 20px;
             left: 20px;
+            z-index: 101;
         }
 
         .back-btn {
-            background: white;
-            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.9);
+            padding: 0.5rem 0.75rem;
             border-radius: 20px;
             text-decoration: none;
             color: #333;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 500;
             letter-spacing: 0.02em;
             text-transform: uppercase;
             transition: all 0.3s ease;
         }
 
-        .back-btn:hover {
-            background: #f0f0f0;
+        .back-btn:hover, .back-btn:active {
+            background: rgba(255,255,255,1);
             transform: translateY(-2px);
         }
 
         .loading {
             text-align: center;
             padding: 2rem;
-            color: #666;
+            color: white;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
         }
 
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
 
         .footer {
-            background: #fafafa;
-            border-top: 1px solid #e0e0e0;
-            padding: 1.5rem 0;
+            background: rgba(0,0,0,0.8);
+            padding: 1rem 0;
             text-align: center;
-            margin-top: auto;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
         }
 
         .copyright {
-            font-size: 0.85rem;
-            color: #666666;
+            font-size: 0.75rem;
+            color: #ccc;
             font-weight: 400;
             letter-spacing: 0.02em;
             text-transform: uppercase;
             margin: 0;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.75rem;
+            }
+            
+            .title {
+                font-size: 1.2rem;
+            }
+            
+            .subtitle {
+                font-size: 0.7rem;
+            }
+            
+            .main {
+                margin-top: 70px;
+            }
+            
+            .slideshow-container {
+                height: calc(100vh - 70px);
+            }
+            
+            .controls {
+                bottom: 15px;
+                padding: 0.5rem;
+                gap: 0.25rem;
+            }
+            
+            .btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+                min-width: 35px;
+            }
+            
+            .counter {
+                padding: 0 0.5rem;
+                font-size: 0.7rem;
+            }
+            
+            .back-link {
+                top: 15px;
+                left: 15px;
+            }
+            
+            .back-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Touch-friendly controls */
+        .btn {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* Prevent text selection */
+        .slideshow-container {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
     </style>
 </head>
@@ -190,7 +294,10 @@
 
     <main class="main">
         <div class="slideshow-container" id="slideshow">
-            <div class="loading" id="loading">Loading Film Experience...</div>
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <div>Loading Film Experience...</div>
+            </div>
         </div>
     </main>
 
@@ -200,9 +307,6 @@
         </a>
     </div>
 
-
-
-    <!-- Footer with copyright -->
     <footer class="footer">
         <div class="container">
             <p class="copyright">© 2025 Wenlanbo. All rights reserved.</p>
@@ -210,60 +314,82 @@
     </footer>
 
     <script>
-        // Slideshow with images from Vercel Blob
+        // Mobile-optimized slideshow
         let images = [];
-        async function loadImagesFromAPI() {
-            try {
-                updateStatus('Loading images from API...');
-                const response = await fetch('/api/photos?folder=new-day-one&limit=100');
-                
-                if (!response.ok) {
-                    throw new Error(`API failed: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                const apiImages = data.photos || [];
-                
-                if (apiImages.length > 0) {
-                    images = apiImages.map(photo => photo.src || photo.url);
-                    updateStatus(`Loaded ${images.length} images from API`);
-                } else {
-                    // Fallback to placeholder images if no API images
-                    images = [
-                        'https://picsum.photos/800/600?random=1',
-                        'https://picsum.photos/800/600?random=2',
-                        'https://picsum.photos/800/600?random=3',
-                        'https://picsum.photos/800/600?random=4',
-                        'https://picsum.photos/800/600?random=5',
-                        'https://picsum.photos/800/600?random=6'
-                    ];
-                    updateStatus('No API images, using placeholders');
-                }
-            } catch (error) {
-                console.error('Error loading from API:', error);
-                // Fallback to placeholder images
-                images = [
-                    'https://picsum.photos/800/600?random=1',
-                    'https://picsum.photos/800/600?random=2',
-                    'https://picsum.photos/800/600?random=3',
-                    'https://picsum.photos/800/600?random=4',
-                    'https://picsum.photos/800/600?random=5',
-                    'https://picsum.photos/800/600?random=6'
-                ];
-                updateStatus('API failed, using placeholders');
-            }
-        }
-
         let currentSlide = 0;
         let autoPlayInterval = null;
         let slides = [];
+        let isLoading = true;
 
-        function updateStatus(message) {
-            console.log('Status:', message);
+        function log(message) {
+            console.log(`[New Day One] ${message}`);
+        }
+
+        async function loadImagesFromAPI() {
+            try {
+                log('Loading images from API...');
+                
+                // Try multiple API endpoints
+                const endpoints = [
+                    '/api/photos?folder=new-day-one&limit=100',
+                    '/api/photos?folder=new-day-one',
+                    '/api/photos'
+                ];
+                
+                let response = null;
+                let data = null;
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        log(`Trying endpoint: ${endpoint}`);
+                        response = await fetch(endpoint, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Cache-Control': 'no-cache'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            data = await response.json();
+                            log(`Success with endpoint: ${endpoint}`);
+                            break;
+                        }
+                    } catch (e) {
+                        log(`Failed endpoint ${endpoint}: ${e.message}`);
+                        continue;
+                    }
+                }
+                
+                if (data && data.photos && data.photos.length > 0) {
+                    images = data.photos.map(photo => photo.src || photo.url);
+                    log(`Loaded ${images.length} images from API`);
+                } else {
+                    throw new Error('No images found in API response');
+                }
+                
+            } catch (error) {
+                log(`API failed: ${error.message}`);
+                
+                // Fallback to static images
+                images = [
+                    '/images/724-10.JPG',
+                    '/images/724-56.JPG',
+                    '/images/724-62.JPG',
+                    '/images/724-70.JPG',
+                    '/images/84190002.JPG',
+                    '/images/84190003.JPG',
+                    '/images/84190004.JPG',
+                    '/images/84190006.JPG',
+                    '/images/84190007.JPG',
+                    '/images/84190010.JPG'
+                ];
+                log(`Using ${images.length} fallback images`);
+            }
         }
 
         function createSlides() {
-            updateStatus('Creating slides...');
+            log('Creating slides...');
             const slideshow = document.getElementById('slideshow');
             slideshow.innerHTML = '';
 
@@ -275,13 +401,16 @@
                 const img = document.createElement('img');
                 img.src = src;
                 img.alt = `Slide ${index + 1}`;
+                img.loading = 'lazy';
 
                 img.onload = () => {
-                    updateStatus(`Image ${index + 1} loaded`);
+                    log(`Image ${index + 1} loaded successfully`);
                 };
 
                 img.onerror = () => {
-                    updateStatus(`Image ${index + 1} failed`);
+                    log(`Image ${index + 1} failed to load: ${src}`);
+                    // Replace with placeholder if image fails
+                    img.src = `https://picsum.photos/800/600?random=${index + 1}`;
                 };
 
                 slide.appendChild(img);
@@ -289,11 +418,13 @@
                 slides.push(slide);
             });
 
-            updateStatus(`Created ${slides.length} slides`);
+            log(`Created ${slides.length} slides`);
         }
 
         function showSlide(index) {
-            updateStatus(`Showing slide ${index + 1}`);
+            if (slides.length === 0) return;
+            
+            log(`Showing slide ${index + 1}`);
             
             // Hide all slides
             slides.forEach((slide, i) => {
@@ -308,6 +439,8 @@
         }
 
         function nextSlide() {
+            if (slides.length === 0) return;
+            
             let next = currentSlide + 1;
             if (next >= slides.length) {
                 next = 0;
@@ -316,6 +449,8 @@
         }
 
         function prevSlide() {
+            if (slides.length === 0) return;
+            
             let prev = currentSlide - 1;
             if (prev < 0) {
                 prev = slides.length - 1;
@@ -332,23 +467,14 @@
 
         function startAutoPlay() {
             stopAutoPlay();
-            autoPlayInterval = setInterval(nextSlide, 3000);
-            updateStatus('Auto-play started');
+            autoPlayInterval = setInterval(nextSlide, 4000);
+            log('Auto-play started');
         }
 
         function stopAutoPlay() {
             if (autoPlayInterval) {
                 clearInterval(autoPlayInterval);
                 autoPlayInterval = null;
-            }
-            updateStatus('Auto-play stopped');
-        }
-
-        function togglePlay() {
-            if (autoPlayInterval) {
-                stopAutoPlay();
-            } else {
-                startAutoPlay();
             }
         }
 
@@ -358,9 +484,11 @@
 
             const prevBtn = document.createElement('button');
             prevBtn.className = 'btn';
-            prevBtn.textContent = '←';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
             prevBtn.onclick = () => {
                 prevSlide();
+                // Restart autoplay after manual navigation
+                startAutoPlay();
             };
 
             const counter = document.createElement('div');
@@ -369,9 +497,11 @@
 
             const nextBtn = document.createElement('button');
             nextBtn.className = 'btn';
-            nextBtn.textContent = '→';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
             nextBtn.onclick = () => {
                 nextSlide();
+                // Restart autoplay after manual navigation
+                startAutoPlay();
             };
 
             controls.appendChild(prevBtn);
@@ -382,33 +512,128 @@
         }
 
         function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+            isLoading = false;
+        }
+
+        function showError(message) {
+            const slideshow = document.getElementById('slideshow');
+            slideshow.innerHTML = `
+                <div class="error-message">
+                    <div>⚠️ ${message}</div>
+                    <div style="margin-top: 1rem; font-size: 0.8rem;">
+                        Please check your connection and try again.
+                    </div>
+                </div>
+            `;
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
-            updateStatus('Page loaded, initializing...');
-            await loadImagesFromAPI();
-            createSlides();
-            createControls();
-            showSlide(0);
-            hideLoading();
+            log('Page loaded, initializing...');
             
-            // Start auto-play immediately
-            startAutoPlay();
+            try {
+                await loadImagesFromAPI();
+                
+                if (images.length === 0) {
+                    showError('No images available');
+                    return;
+                }
+                
+                createSlides();
+                createControls();
+                showSlide(0);
+                hideLoading();
+                
+                // Start auto-play after a short delay
+                setTimeout(() => {
+                    startAutoPlay();
+                }, 1000);
+                
+                log('Initialization complete');
+                
+            } catch (error) {
+                log(`Initialization failed: ${error.message}`);
+                showError('Failed to load slideshow');
+            }
         });
 
         // Keyboard controls
         document.addEventListener('keydown', (e) => {
+            if (isLoading) return;
+            
             switch(e.key) {
                 case 'ArrowLeft':
                     e.preventDefault();
                     prevSlide();
+                    startAutoPlay();
                     break;
                 case 'ArrowRight':
                     e.preventDefault();
                     nextSlide();
+                    startAutoPlay();
                     break;
+                case ' ':
+                    e.preventDefault();
+                    if (autoPlayInterval) {
+                        stopAutoPlay();
+                    } else {
+                        startAutoPlay();
+                    }
+                    break;
+            }
+        });
+
+        // Touch controls for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (isLoading) return;
+            
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left - next slide
+                    nextSlide();
+                } else {
+                    // Swipe right - previous slide
+                    prevSlide();
+                }
+                startAutoPlay();
+            }
+        }
+
+        // Pause autoplay when page is not visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoPlay();
+            } else {
+                if (!isLoading && slides.length > 0) {
+                    startAutoPlay();
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            // Recalculate slide positions if needed
+            if (slides.length > 0) {
+                showSlide(currentSlide);
             }
         });
     </script>
