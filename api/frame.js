@@ -23,11 +23,8 @@ export default function handler(req, res) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Day One - Film Experience</title>
     
-    <!-- Farcaster Frame Meta Tags -->
-    <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="${baseUrl}/frame-og.png" />
-    <meta property="fc:frame:button:1" content="View Slideshow" />
-    <meta property="fc:frame:post_url" content="${baseUrl}/api/frame-handler" />
+    <!-- Farcaster Mini App Meta Tags -->
+    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"${baseUrl}/frame-og.png","button":{"title":"View Slideshow","action":{"type":"launch_frame","name":"New Day One","url":"${baseUrl}/frame","splashImageUrl":"${baseUrl}/app-icon.png","splashBackgroundColor":"#FFFFFF"}}}' />
     
     <style>
         * {
