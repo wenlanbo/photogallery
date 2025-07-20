@@ -11,8 +11,8 @@
     <meta property="fc:frame:button:1" content="View Slideshow" />
     <meta property="fc:frame:post_url" content="https://w.enlan.bo/api/frame" />
     
-    <!-- Farcaster Frame SDK -->
-    <script src="https://unpkg.com/@farcaster/frame-js@0.0.8/dist/index.js"></script>
+    <!-- Farcaster Mini App SDK -->
+    <script src="https://unpkg.com/@farcaster/miniapp-sdk@0.0.7/dist/index.js"></script>
     
     <style>
         * {
@@ -164,7 +164,7 @@
     </header>
 
     <div class="farcaster-info">
-        📸 Farcaster Frame
+        📸 Farcaster Mini App
     </div>
 
     <div class="slideshow-container" id="slideshow">
@@ -172,87 +172,81 @@
     </div>
 
     <script>
-        // Initialize Farcaster Frame SDK
+        // Farcaster Mini App SDK initialization
         let sdk;
-        let sdkReadyCalled = false;
-        
-        async function initializeFarcasterFrame() {
+        let readyCalled = false;
+
+        async function initializeFarcasterSDK() {
             try {
-                // Wait for the SDK to be available
+                console.log('🔧 Initializing Farcaster Mini App SDK...');
+                
+                // Wait for SDK to be available
                 await new Promise(resolve => {
-                    if (typeof Frame !== 'undefined') {
-                        resolve();
-                    } else {
-                        // Wait for SDK to load
-                        const checkSDK = () => {
-                            if (typeof Frame !== 'undefined') {
-                                resolve();
-                            } else {
-                                setTimeout(checkSDK, 100);
-                            }
-                        };
-                        checkSDK();
-                    }
+                    const checkSDK = () => {
+                        if (typeof window.FarcasterMiniApp !== 'undefined') {
+                            resolve();
+                        } else {
+                            setTimeout(checkSDK, 100);
+                        }
+                    };
+                    checkSDK();
                 });
 
-                // Initialize the Farcaster Frame SDK
-                sdk = new Frame({
+                // Initialize the SDK
+                sdk = new window.FarcasterMiniApp({
                     frameUrl: window.location.href,
                     frameData: {
-                        fid: 302199, // Your FID
-                        network: 1, // Mainnet
+                        fid: 302199,
+                        network: 1,
                     },
                 });
 
-                console.log('Farcaster Frame SDK initialized successfully');
+                console.log('✅ Farcaster Mini App SDK initialized');
                 
             } catch (error) {
-                console.error('Error initializing Farcaster Frame:', error);
+                console.error('❌ Error initializing SDK:', error);
             }
         }
 
-        async function callSdkReady() {
-            if (sdkReadyCalled) return;
+        async function callReady() {
+            if (readyCalled) return;
             
             try {
-                console.log('Attempting to call sdk.actions.ready()...');
+                console.log('🚀 Calling sdk.actions.ready()...');
                 
-                // Try multiple methods to call ready()
                 if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
-                    console.log('Using sdk.actions.ready()');
                     await sdk.actions.ready();
                     console.log('✅ sdk.actions.ready() called successfully');
-                } else if (window.farcaster && window.farcaster.ready) {
-                    console.log('Using window.farcaster.ready()');
-                    await window.farcaster.ready();
-                    console.log('✅ window.farcaster.ready() called successfully');
-                } else if (window.parent && window.parent.postMessage) {
-                    console.log('Using postMessage to parent');
-                    window.parent.postMessage({ type: 'ready' }, '*');
-                    console.log('✅ postMessage ready sent');
+                    readyCalled = true;
                 } else {
-                    console.log('No SDK methods available, trying direct call');
-                    // Try to call ready directly if available
-                    if (typeof ready === 'function') {
-                        await ready();
-                        console.log('✅ Direct ready() called');
+                    console.log('⚠️ SDK not available, trying alternative methods...');
+                    
+                    // Try alternative methods
+                    if (window.farcaster && window.farcaster.ready) {
+                        await window.farcaster.ready();
+                        console.log('✅ window.farcaster.ready() called');
+                        readyCalled = true;
+                    } else if (window.parent && window.parent.postMessage) {
+                        window.parent.postMessage({ type: 'ready' }, '*');
+                        console.log('✅ postMessage ready sent');
+                        readyCalled = true;
+                    } else {
+                        console.log('❌ No ready methods available');
+                        readyCalled = true; // Prevent infinite retries
                     }
                 }
                 
-                sdkReadyCalled = true;
-                console.log('🎉 Splash screen should be removed');
-                
             } catch (error) {
                 console.error('❌ Error calling ready():', error);
-                sdkReadyCalled = true; // Prevent infinite retries
+                readyCalled = true; // Prevent infinite retries
             }
         }
 
-        // Slideshow with images from Vercel Blob
+        // Slideshow functionality
         let images = [];
         async function loadImagesFromAPI() {
             try {
-                updateStatus('Loading images from API...');
+                console.log('📸 Loading images from API...');
                 const response = await fetch('/api/photos?folder=new-day-one&limit=50');
                 
                 if (!response.ok) {
@@ -264,9 +258,9 @@
                 
                 if (apiImages.length > 0) {
                     images = apiImages.map(photo => photo.src || photo.url);
-                    updateStatus(`Loaded ${images.length} images from API`);
+                    console.log(`✅ Loaded ${images.length} images from API`);
                 } else {
-                    // Fallback to placeholder images if no API images
+                    // Fallback to placeholder images
                     images = [
                         'https://picsum.photos/800/600?random=1',
                         'https://picsum.photos/800/600?random=2',
@@ -275,10 +269,10 @@
                         'https://picsum.photos/800/600?random=5',
                         'https://picsum.photos/800/600?random=6'
                     ];
-                    updateStatus('No API images, using placeholders');
+                    console.log('⚠️ No API images, using placeholders');
                 }
             } catch (error) {
-                console.error('Error loading from API:', error);
+                console.error('❌ Error loading from API:', error);
                 // Fallback to placeholder images
                 images = [
                     'https://picsum.photos/800/600?random=1',
@@ -288,7 +282,7 @@
                     'https://picsum.photos/800/600?random=5',
                     'https://picsum.photos/800/600?random=6'
                 ];
-                updateStatus('API failed, using placeholders');
+                console.log('⚠️ API failed, using placeholders');
             }
         }
 
@@ -296,12 +290,8 @@
         let autoPlayInterval = null;
         let slides = [];
 
-        function updateStatus(message) {
-            console.log('Status:', message);
-        }
-
         function createSlides() {
-            updateStatus('Creating slides...');
+            console.log('🎬 Creating slides...');
             const slideshow = document.getElementById('slideshow');
             slideshow.innerHTML = '';
 
@@ -315,22 +305,22 @@
                 img.alt = `Slide ${index + 1}`;
 
                 img.onload = () => {
-                    updateStatus(`Image ${index + 1} loaded`);
+                    console.log(`✅ Image ${index + 1} loaded`);
                     
-                    // If this is the cover image (first image), call sdk ready
+                    // Call ready() when first image loads
                     if (index === 0) {
-                        updateStatus('Cover image loaded, calling sdk.actions.ready()');
-                        callSdkReady();
+                        console.log('🎯 First image loaded, calling ready()');
+                        callReady();
                     }
                 };
 
                 img.onerror = () => {
-                    updateStatus(`Image ${index + 1} failed`);
+                    console.log(`❌ Image ${index + 1} failed`);
                     
-                    // If cover image failed, still try to call ready() to remove splash screen
+                    // Call ready() even if first image fails
                     if (index === 0) {
-                        updateStatus('Cover image failed, but calling sdk.actions.ready() anyway');
-                        callSdkReady();
+                        console.log('🎯 First image failed, calling ready() anyway');
+                        callReady();
                     }
                 };
 
@@ -339,20 +329,17 @@
                 slides.push(slide);
             });
 
-            updateStatus(`Created ${slides.length} slides`);
+            console.log(`✅ Created ${slides.length} slides`);
         }
 
         function showSlide(index) {
-            updateStatus(`Showing slide ${index + 1}`);
+            console.log(`🎬 Showing slide ${index + 1}`);
             
-            // Hide all slides
             slides.forEach((slide, i) => {
                 slide.classList.remove('active');
             });
             
-            // Show current slide
             slides[index].classList.add('active');
-            
             currentSlide = index;
             updateCounter();
         }
@@ -383,7 +370,7 @@
         function startAutoPlay() {
             stopAutoPlay();
             autoPlayInterval = setInterval(nextSlide, 4000);
-            updateStatus('Auto-play started');
+            console.log('▶️ Auto-play started');
         }
 
         function stopAutoPlay() {
@@ -391,7 +378,6 @@
                 clearInterval(autoPlayInterval);
                 autoPlayInterval = null;
             }
-            updateStatus('Auto-play stopped');
         }
 
         function createControls() {
@@ -427,30 +413,37 @@
             document.getElementById('loading').style.display = 'none';
         }
 
-        // Initialize
+        // Initialize everything
         document.addEventListener('DOMContentLoaded', async () => {
-            updateStatus('Frame loaded, initializing...');
+            console.log('🚀 Frame loaded, initializing...');
             
-            // Initialize Farcaster Frame SDK first
-            await initializeFarcasterFrame();
-            
-            // Then load the slideshow
-            await loadImagesFromAPI();
-            createSlides();
-            createControls();
-            showSlide(0);
-            hideLoading();
-            
-            // Start auto-play immediately
-            startAutoPlay();
-            
-            // Fallback: call sdk ready after a timeout if not called yet
-            setTimeout(() => {
-                if (!sdkReadyCalled) {
-                    updateStatus('Fallback: calling sdk.actions.ready() after timeout');
-                    callSdkReady();
-                }
-            }, 2000);
+            try {
+                // Initialize Farcaster SDK first
+                await initializeFarcasterSDK();
+                
+                // Load images and create slideshow
+                await loadImagesFromAPI();
+                createSlides();
+                createControls();
+                showSlide(0);
+                hideLoading();
+                
+                // Start auto-play
+                startAutoPlay();
+                
+                // Fallback: call ready after 1 second if not called yet
+                setTimeout(() => {
+                    if (!readyCalled) {
+                        console.log('⏰ Fallback: calling ready() after timeout');
+                        callReady();
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ Initialization error:', error);
+                // Still try to call ready() even if there's an error
+                callReady();
+            }
         });
 
         // Keyboard controls
