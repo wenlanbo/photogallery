@@ -7,9 +7,12 @@
     
     <!-- Farcaster Frame Meta Tags -->
     <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="https://your-domain.vercel.app/frame-og.png" />
+    <meta property="fc:frame:image" content="https://w.enlan.bo/frame-og.png" />
     <meta property="fc:frame:button:1" content="View Slideshow" />
-    <meta property="fc:frame:post_url" content="https://your-domain.vercel.app/api/frame" />
+    <meta property="fc:frame:post_url" content="https://w.enlan.bo/api/frame" />
+    
+    <!-- Farcaster Frame SDK -->
+    <script src="https://unpkg.com/@farcaster/frame-js@0.0.8/dist/index.js"></script>
     
     <style>
         * {
@@ -169,6 +172,29 @@
     </div>
 
     <script>
+        // Initialize Farcaster Frame SDK
+        let sdk;
+        
+        async function initializeFarcasterFrame() {
+            try {
+                // Initialize the Farcaster Frame SDK
+                sdk = new Frame({
+                    frameUrl: window.location.href,
+                    frameData: {
+                        fid: 302199, // Your FID
+                        network: 1, // Mainnet
+                    },
+                });
+
+                // Call ready() to remove splash screen
+                await sdk.actions.ready();
+                console.log('Farcaster Frame SDK initialized and ready');
+                
+            } catch (error) {
+                console.error('Error initializing Farcaster Frame:', error);
+            }
+        }
+
         // Slideshow with images from Vercel Blob
         let images = [];
         async function loadImagesFromAPI() {
@@ -339,6 +365,11 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             updateStatus('Frame loaded, initializing...');
+            
+            // Initialize Farcaster Frame SDK first
+            await initializeFarcasterFrame();
+            
+            // Then load the slideshow
             await loadImagesFromAPI();
             createSlides();
             createControls();
