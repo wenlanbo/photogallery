@@ -60,6 +60,10 @@
       "dest": "/images/$1"
     },
     {
+      "src": "/sw.js",
+      "dest": "/404.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }

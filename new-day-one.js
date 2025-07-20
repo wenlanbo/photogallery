@@ -46,8 +46,26 @@ class CardDeckExperience {
             
         } catch (error) {
             console.error('Error loading photos:', error);
-            this.showErrorMessage();
+            // Fallback to local images if API fails
+            this.loadFallbackPhotos();
         }
+    }
+    
+    loadFallbackPhotos() {
+        console.log('Loading fallback photos from local images...');
+        
+        // Use some local images as fallback
+        this.photos = [
+            { src: '/images/724-10.JPG', alt: 'New Day One - 1' },
+            { src: '/images/724-56.JPG', alt: 'New Day One - 2' },
+            { src: '/images/724-62.JPG', alt: 'New Day One - 3' },
+            { src: '/images/724-70.JPG', alt: 'New Day One - 4' },
+            { src: '/images/84190002.JPG', alt: 'New Day One - 5' },
+            { src: '/images/84190003.JPG', alt: 'New Day One - 6' }
+        ];
+        
+        this.createCards();
+        this.hideLoading();
     }
     
     createCards() {
@@ -181,9 +199,15 @@ class CardDeckExperience {
             <div style="text-align: center; padding: 2rem;">
                 <i class="fas fa-images" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
                 <p>No photos found in the New Day One collection.</p>
-                <p style="font-size: 0.8rem; margin-top: 0.5rem;">Please add photos to the /new-day-one folder.</p>
+                <p style="font-size: 0.8rem; margin-top: 0.5rem;">Please add photos to the /new-day-one folder in Vercel Blob.</p>
+                <p style="font-size: 0.7rem; margin-top: 0.5rem; color: #999;">Using fallback images for now.</p>
             </div>
         `;
+        
+        // Load fallback photos after showing the message
+        setTimeout(() => {
+            this.loadFallbackPhotos();
+        }, 2000);
     }
     
     showErrorMessage() {
@@ -199,5 +223,13 @@ class CardDeckExperience {
 
 // Initialize the experience when the page loads
 document.addEventListener('DOMContentLoaded', () => {
+    // Suppress Vercel service worker errors
+    window.addEventListener('error', (e) => {
+        if (e.message.includes('mobx-state-tree') || e.message.includes('sw.js')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
     new CardDeckExperience();
 }); 
