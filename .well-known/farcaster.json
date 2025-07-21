@@ -14,7 +14,10 @@
       "screenshotUrls": [
         "https://w.enlan.bo/screenshot1.png"
       ],
-      "heroImageUrl": "https://w.enlan.bo/screenshot1.png"
+      "heroImageUrl": "https://w.enlan.bo/screenshot1.png",
+      "ogImageUrl": "https://w.enlan.bo/screenshot1.png",
+      "ogTitle": "New Day One",
+      "ogDescription": "A Film Experience by Wenlanbo"
     },
     "accountAssociation": {
       "header": "eyJmaWQiOjMwMjE5OSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDQyQTFjNTQwRjdjNWMxMDUzZmI0OEZEMGFGMmUyMDc0MDRlNDRBNzEifQ",
