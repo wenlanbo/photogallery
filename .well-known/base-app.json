@@ -1,0 +1,16 @@
+{
+  "name": "New Day One",
+  "version": "1.0.0",
+  "description": "A Film Experience by Wenlanbo",
+  "iconUrl": "https://w.enlan.bo/app-icon.png",
+  "splashImageUrl": "https://w.enlan.bo/app-icon.png",
+  "splashBackgroundColor": "#FFFFFF",
+  "homeUrl": "https://w.enlan.bo/frame",
+  "primaryCategory": "entertainment",
+  "screenshotUrls": [
+    "https://w.enlan.bo/screenshot1.png"
+  ],
+  "heroImageUrl": "https://w.enlan.bo/screenshot1.png",
+  "subtitle": "A Film Experience",
+  "author": "Wenlanbo"
+} 

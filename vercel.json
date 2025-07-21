@@ -84,6 +84,14 @@
       "dest": "/.well-known/farcaster.json"
     },
     {
+      "src": "/.well-known/base-app.json",
+      "dest": "/.well-known/base-app.json"
+    },
+    {
+      "src": "/base-app.json",
+      "dest": "/base-app.json"
+    },
+    {
       "src": "/",
       "dest": "/index.html"
     },
