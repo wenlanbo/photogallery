@@ -3,6 +3,8 @@
       "name": "Photo Gallery",
       "version": "1",
       "iconUrl": "https://w.enlan.bo/app-icon.png",
+      "tagline": ["film", "camera", "event", "experience"],
+      "tags": ["film", "camera", "photo"],
       "homeUrl": "https://w.enlan.bo/frame-minikit",
       "imageUrl": "https://w.enlan.bo/screenshot1.png",
       "splashImageUrl": "https://w.enlan.bo/app-icon.png",
