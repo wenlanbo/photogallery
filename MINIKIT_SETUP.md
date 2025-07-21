@@ -1,40 +1,39 @@
-# MiniKit Integration Guide
+# Enhanced Base App Compatibility Guide
 
-This guide explains how to use MiniKit with your photo gallery Mini App for enhanced Base App and Coinbase Wallet compatibility.
+This guide explains how to use the enhanced SDK loading approach for better Base App and Coinbase Wallet compatibility.
 
-## What is MiniKit?
+## What is Enhanced SDK Loading?
 
-MiniKit is a React library that provides Coinbase Wallet-specific hooks and utilities for building Mini Apps. It simplifies the development process and provides better integration with Base App and Coinbase Wallet.
+This approach provides better SDK loading with multiple fallbacks for different platforms (Farcaster, Base App, Coinbase Wallet). It ensures your Mini App works reliably across all platforms.
 
 ## Files Added
 
 ### 1. `frame-minikit.html`
-A vanilla HTML/JS version that integrates MiniKit utilities via CDN. This maintains your current approach while adding MiniKit benefits.
+A vanilla HTML/JS version with enhanced SDK loading and better fallbacks. This maintains your current approach while adding Base App compatibility.
 
 ### 2. `MiniKitApp.jsx`
-A React component that uses MiniKit hooks for enhanced functionality. Use this if you want to migrate to React.
+A React component example for future MiniKit integration when it becomes available.
 
 ### 3. `package.json` (updated)
-Added `@coinbase/minikit` dependency.
+Maintains existing dependencies for compatibility.
 
-## Key MiniKit Features
+## Key Enhanced Features
 
-### 1. **useIsInMiniApp()**
-Detects if your app is running inside a Mini App environment:
+### 1. **Multi-Platform SDK Loading**
+Automatically detects and loads the appropriate SDK for each platform:
 ```javascript
-const isInMiniApp = useIsInMiniApp();
-console.log(`Mini App environment: ${isInMiniApp}`);
+// Tries Farcaster SDK first, then falls back to global SDK
+const sdk = await loadEnhancedSDK();
 ```
 
-### 2. **useMiniAppSDK()**
-Provides access to the Mini App SDK with automatic fallbacks:
-```javascript
-const sdk = useMiniAppSDK();
-await sdk.actions.ready(); // Dismiss splash screen
-```
+### 2. **Automatic Fallbacks**
+Provides multiple fallback mechanisms:
+- Farcaster SDK (ES6 module)
+- Global SDK (Base App, Coinbase Wallet)
+- Mock SDK (for testing)
 
 ### 3. **Enhanced Compatibility**
-MiniKit automatically handles:
+Automatically handles:
 - SDK loading across different platforms
 - Fallback mechanisms for unsupported features
 - Platform-specific optimizations

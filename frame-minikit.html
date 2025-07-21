@@ -278,8 +278,8 @@
 
     <!-- MiniKit Integration -->
     <script type="module">
-        // Import MiniKit utilities
-        import { useIsInMiniApp, useMiniAppSDK } from 'https://esm.sh/@coinbase/minikit';
+        // Import MiniKit utilities from CDN (when available)
+        // For now, using enhanced SDK loading with better fallbacks
 
         // Mobile-optimized slideshow
         let images = [];
@@ -294,40 +294,24 @@
             console.log(`[MiniKit Mini App] ${message}`);
         }
 
-        // MiniKit SDK loading with enhanced compatibility
-        async function loadMiniKitSDK() {
+        // Enhanced SDK loading with better fallbacks for Base App compatibility
+        async function loadEnhancedSDK() {
             try {
-                log('🚀 Loading MiniKit SDK...');
+                log('🚀 Loading enhanced SDK for Base App compatibility...');
                 
-                // Try MiniKit first
-                const minikit = await import('https://esm.sh/@coinbase/minikit');
-                log('✅ MiniKit loaded successfully');
-                
-                // Check if we're in a Mini App environment
-                const isInMiniApp = minikit.useIsInMiniApp?.() || false;
-                log(`📍 Mini App environment detected: ${isInMiniApp}`);
-                
-                // Get SDK from MiniKit
-                sdk = minikit.useMiniAppSDK?.() || null;
-                
-                if (sdk) {
-                    log('✅ MiniKit SDK loaded');
-                    return true;
-                }
-                
-                // Fallback to Farcaster SDK
+                // Try Farcaster SDK first
                 const farcasterModule = await import('https://esm.sh/@farcaster/miniapp-sdk');
                 sdk = farcasterModule.sdk;
-                log('✅ Farcaster SDK loaded as fallback');
+                log('✅ Farcaster SDK loaded successfully');
                 return true;
                 
             } catch (error) {
-                log(`⚠️ MiniKit import failed: ${error.message}`);
+                log(`⚠️ Farcaster SDK import failed: ${error.message}`);
                 
-                // Fallback to global SDK
+                // Fallback to global SDK (Base App, Coinbase Wallet)
                 if (window.sdk) {
                     sdk = window.sdk;
-                    log('✅ SDK loaded from global window.sdk');
+                    log('✅ SDK loaded from global window.sdk (Base App/Coinbase Wallet)');
                     return true;
                 }
                 
@@ -592,12 +576,12 @@
             `;
         }
 
-        // Initialize MiniKit Mini App
+        // Initialize Enhanced Mini App for Base App compatibility
         document.addEventListener('DOMContentLoaded', async () => {
-            log('🚀 MiniKit Mini App loaded, initializing...');
+            log('🚀 Enhanced Mini App loaded, initializing...');
             
-            // Load MiniKit SDK first
-            await loadMiniKitSDK();
+            // Load enhanced SDK first
+            await loadEnhancedSDK();
             
             // Load cover image immediately for fast startup
             loadCoverImage();
@@ -622,7 +606,7 @@
                     startAutoPlay();
                 }, 1000);
                 
-                log('✅ Full slideshow loaded with MiniKit');
+                log('✅ Full slideshow loaded with enhanced Base App compatibility');
                 
             } catch (error) {
                 log(`❌ Full slideshow failed: ${error.message}`);
