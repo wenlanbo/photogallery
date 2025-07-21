@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>New Day One - A Film Experience</title>
+    
+    <!-- Farcaster Mini App Meta Tags -->
+    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://w.enlan.bo/app-icon.png","button":{"title":"View Slideshow","action":{"type":"launch_frame","name":"New Day One","url":"https://w.enlan.bo/frame","splashImageUrl":"https://w.enlan.bo/app-icon.png","splashBackgroundColor":"#FFFFFF"}}}' />
+    
+    <!-- Base App Mini App Meta Tags -->
+    <meta name="base:miniapp" content='{"version":"1","name":"New Day One","description":"A Film Experience by Wenlanbo","iconUrl":"https://w.enlan.bo/app-icon.png","splashImageUrl":"https://w.enlan.bo/app-icon.png","splashBackgroundColor":"#FFFFFF","homeUrl":"https://w.enlan.bo/frame"}' />
+    
+    <link rel="icon" type="image/png" href="icons/wenlanbo.png">
+    <link rel="shortcut icon" type="image/png" href="icons/wenlanbo.png">
+    <link rel="apple-touch-icon" href="icons/wenlanbo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: rgba(0,0,0,0.8);
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            color: #ccc;
+            font-size: 0.8rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-top: 80px;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100vw;
+            height: calc(100vh - 80px);
+            background: #000;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 0;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.8);
+            padding: 0.75rem;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            background: white;
+            border: none;
+            color: #333;
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover, .btn:active {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .counter {
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: white;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            background: rgba(0,0,0,0.8);
+            padding: 1rem 0;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .copyright {
+            font-size: 0.75rem;
+            color: #ccc;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.75rem;
+            }
+            
+            .title {
+                font-size: 1.2rem;
+            }
+            
+            .subtitle {
+                font-size: 0.7rem;
+            }
+            
+            .main {
+                margin-top: 70px;
+            }
+            
+            .slideshow-container {
+                height: calc(100vh - 70px);
+            }
+            
+            .controls {
+                bottom: 75px;
+                padding: 0.5rem;
+                gap: 0.25rem;
+            }
+            
+            .btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+                min-width: 35px;
+            }
+            
+            .counter {
+                padding: 0 0.5rem;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Touch-friendly controls */
+        .btn {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* Prevent text selection */
+        .slideshow-container {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="title">New Day One</h1>
+        <p class="subtitle">A Film Experience</p>
+    </header>
+
+    <main class="main">
+        <div class="slideshow-container" id="slideshow">
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <div>Loading Film Experience...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="copyright">© 2025 Wenlanbo. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- MiniKit Integration -->
+    <script type="module">
+        // Import MiniKit utilities
+        import { useIsInMiniApp, useMiniAppSDK } from 'https://esm.sh/@coinbase/minikit';
+
+        // Mobile-optimized slideshow
+        let images = [];
+        let currentSlide = 0;
+        let autoPlayInterval = null;
+        let slides = [];
+        let isLoading = true;
+        let readyCalled = false;
+        let sdk = null;
+
+        function log(message) {
+            console.log(`[MiniKit Mini App] ${message}`);
+        }
+
+        // MiniKit SDK loading with enhanced compatibility
+        async function loadMiniKitSDK() {
+            try {
+                log('🚀 Loading MiniKit SDK...');
+                
+                // Try MiniKit first
+                const minikit = await import('https://esm.sh/@coinbase/minikit');
+                log('✅ MiniKit loaded successfully');
+                
+                // Check if we're in a Mini App environment
+                const isInMiniApp = minikit.useIsInMiniApp?.() || false;
+                log(`📍 Mini App environment detected: ${isInMiniApp}`);
+                
+                // Get SDK from MiniKit
+                sdk = minikit.useMiniAppSDK?.() || null;
+                
+                if (sdk) {
+                    log('✅ MiniKit SDK loaded');
+                    return true;
+                }
+                
+                // Fallback to Farcaster SDK
+                const farcasterModule = await import('https://esm.sh/@farcaster/miniapp-sdk');
+                sdk = farcasterModule.sdk;
+                log('✅ Farcaster SDK loaded as fallback');
+                return true;
+                
+            } catch (error) {
+                log(`⚠️ MiniKit import failed: ${error.message}`);
+                
+                // Fallback to global SDK
+                if (window.sdk) {
+                    sdk = window.sdk;
+                    log('✅ SDK loaded from global window.sdk');
+                    return true;
+                }
+                
+                // Final fallback: Create mock SDK
+                log('⚠️ Creating mock SDK for compatibility');
+                sdk = {
+                    actions: {
+                        ready: async () => {
+                            log('✅ Mock ready() called');
+                            return Promise.resolve();
+                        }
+                    }
+                };
+                return true;
+            }
+        }
+
+        // Call ready() to remove splash screen
+        async function callReady() {
+            if (readyCalled) return;
+            
+            log('🚀 Calling ready() to remove splash screen...');
+            
+            try {
+                // Ensure SDK is loaded
+                if (!sdk) {
+                    await loadMiniKitSDK();
+                }
+                
+                if (sdk && sdk.actions && sdk.actions.ready) {
+                    await sdk.actions.ready();
+                    log('✅ sdk.actions.ready() called successfully');
+                    readyCalled = true;
+                    return true;
+                } else {
+                    log('⚠️ SDK ready() not available, using fallback');
+                    readyCalled = true;
+                    return true;
+                }
+            } catch (error) {
+                log(`❌ Error calling ready(): ${error.message}`);
+                readyCalled = true;
+                return true;
+            }
+        }
+
+        // Load cover image immediately
+        function loadCoverImage() {
+            log('🖼️ Loading cover image immediately...');
+            
+            const slideshow = document.getElementById('slideshow');
+            slideshow.innerHTML = `
+                <div class="slide active" id="cover-slide">
+                    <img src="/images/cover.jpg" alt="Cover" id="cover-image" />
+                </div>
+            `;
+            
+            const coverImage = document.getElementById('cover-image');
+            
+            coverImage.onload = () => {
+                log('✅ Cover image loaded, calling ready() immediately');
+                callReady();
+            };
+            
+            coverImage.onerror = () => {
+                log('❌ Cover image failed, trying fallback...');
+                // Try a different cover image or call ready anyway
+                coverImage.src = '/images/L1000031.JPG';
+                coverImage.onload = () => {
+                    log('✅ Fallback cover image loaded, calling ready()');
+                    callReady();
+                };
+                coverImage.onerror = () => {
+                    log('❌ All cover images failed, calling ready() anyway');
+                    callReady();
+                };
+            };
+        }
+
+        async function loadImagesFromAPI() {
+            try {
+                log('📸 Loading images from API...');
+                
+                const response = await fetch('/api/photos?folder=new-day-one&limit=50');
+                
+                if (!response.ok) {
+                    throw new Error(`API failed: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const apiImages = data.photos || [];
+                
+                if (apiImages.length > 0) {
+                    images = apiImages.map(photo => photo.src || photo.url);
+                    log(`✅ Loaded ${images.length} images from API`);
+                } else {
+                    throw new Error('No images found in API response');
+                }
+                
+            } catch (error) {
+                log(`❌ API failed: ${error.message}`);
+                
+                // Fallback to local images
+                images = [
+                    '/images/L1000031.JPG',
+                    '/images/L1000032.JPG',
+                    '/images/L1000036.JPG',
+                    '/images/L1000039.jpg',
+                    '/images/L1000048.jpg',
+                    '/images/L1000057.jpg',
+                    '/images/L1000058.jpg',
+                    '/images/L1000111.jpg',
+                    '/images/L1000151.jpg',
+                    '/images/L1000172.jpg'
+                ];
+                log(`⚠️ Using ${images.length} fallback images`);
+            }
+        }
+
+        function createSlides() {
+            log('🎬 Creating slides...');
+            const slideshow = document.getElementById('slideshow');
+            slideshow.innerHTML = '';
+
+            if (images.length === 0) {
+                log('⚠️ No images available, creating placeholder slide');
+                const slide = document.createElement('div');
+                slide.className = 'slide active';
+                slide.innerHTML = '<div style="text-align: center; padding: 50px; color: white;">No images available</div>';
+                slideshow.appendChild(slide);
+                slides.push(slide);
+                return;
+            }
+
+            images.forEach((src, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                slide.id = `slide${index}`;
+
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `Slide ${index + 1}`;
+
+                img.onload = () => {
+                    log(`✅ Image ${index + 1} loaded: ${src}`);
+                };
+
+                img.onerror = () => {
+                    log(`❌ Image ${index + 1} failed: ${src}`);
+                };
+
+                slide.appendChild(img);
+                slideshow.appendChild(slide);
+                slides.push(slide);
+            });
+
+            log(`✅ Created ${slides.length} slides`);
+        }
+
+        function showSlide(index) {
+            if (slides.length === 0) return;
+            
+            log(`🎬 Showing slide ${index + 1}`);
+            
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+            });
+            
+            slides[index].classList.add('active');
+            currentSlide = index;
+            updateCounter();
+        }
+
+        function nextSlide() {
+            if (slides.length === 0) return;
+            
+            let next = currentSlide + 1;
+            if (next >= slides.length) {
+                next = 0;
+            }
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            if (slides.length === 0) return;
+            
+            let prev = currentSlide - 1;
+            if (prev < 0) {
+                prev = slides.length - 1;
+            }
+            showSlide(prev);
+        }
+
+        function updateCounter() {
+            const counter = document.querySelector('.counter');
+            if (counter) {
+                counter.innerHTML = `<span id="current">${currentSlide + 1}</span> / <span id="total">${slides.length}</span>`;
+            }
+        }
+
+        function startAutoPlay() {
+            stopAutoPlay();
+            autoPlayInterval = setInterval(nextSlide, 4000);
+            log('▶️ Auto-play started');
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+        }
+
+        function createControls() {
+            const controls = document.createElement('div');
+            controls.className = 'controls';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'btn';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevBtn.onclick = () => {
+                prevSlide();
+                startAutoPlay();
+            };
+
+            const counter = document.createElement('div');
+            counter.className = 'counter';
+            counter.innerHTML = '<span id="current">1</span> / <span id="total">' + slides.length + '</span>';
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextBtn.onclick = () => {
+                nextSlide();
+                startAutoPlay();
+            };
+
+            controls.appendChild(prevBtn);
+            controls.appendChild(counter);
+            controls.appendChild(nextBtn);
+
+            document.getElementById('slideshow').appendChild(controls);
+        }
+
+        function hideLoading() {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+            isLoading = false;
+        }
+
+        function showError(message) {
+            const slideshow = document.getElementById('slideshow');
+            slideshow.innerHTML = `
+                <div class="error-message">
+                    <div>⚠️ ${message}</div>
+                    <div style="margin-top: 1rem; font-size: 0.8rem;">
+                        Please check your connection and try again.
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize MiniKit Mini App
+        document.addEventListener('DOMContentLoaded', async () => {
+            log('🚀 MiniKit Mini App loaded, initializing...');
+            
+            // Load MiniKit SDK first
+            await loadMiniKitSDK();
+            
+            // Load cover image immediately for fast startup
+            loadCoverImage();
+            
+            try {
+                // Load images in background
+                await loadImagesFromAPI();
+                
+                if (images.length === 0) {
+                    log('⚠️ No images available, keeping cover image');
+                    return;
+                }
+                
+                // Replace cover with full slideshow
+                createSlides();
+                createControls();
+                showSlide(0);
+                hideLoading();
+                
+                // Start auto-play after a short delay
+                setTimeout(() => {
+                    startAutoPlay();
+                }, 1000);
+                
+                log('✅ Full slideshow loaded with MiniKit');
+                
+            } catch (error) {
+                log(`❌ Full slideshow failed: ${error.message}`);
+                // Keep the cover image if slideshow fails
+            }
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (isLoading) return;
+            
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    prevSlide();
+                    startAutoPlay();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    nextSlide();
+                    startAutoPlay();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    if (autoPlayInterval) {
+                        stopAutoPlay();
+                    } else {
+                        startAutoPlay();
+                    }
+                    break;
+            }
+        });
+
+        // Touch controls for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (isLoading) return;
+            
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+                startAutoPlay();
+            }
+        }
+
+        // Pause autoplay when page is not visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoPlay();
+            } else {
+                if (!isLoading && slides.length > 0) {
+                    startAutoPlay();
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (slides.length > 0) {
+                showSlide(currentSlide);
+            }
+        });
+    </script>
+</body>
+</html> 

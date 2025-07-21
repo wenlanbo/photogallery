@@ -34,6 +34,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "frame-minikit.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "test-frame.html",
       "use": "@vercel/static"
     },
@@ -102,6 +106,10 @@
     {
       "src": "/frame",
       "dest": "/frame.html"
+    },
+    {
+      "src": "/frame-minikit",
+      "dest": "/frame-minikit.html"
     },
     {
       "src": "/test-frame",
