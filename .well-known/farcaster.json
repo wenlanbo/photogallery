@@ -1,7 +1,7 @@
 {
     "frame": {
       "name": "Photo Gallery",
-      "version": "2",
+      "version": "1",
       "iconUrl": "https://w.enlan.bo/app-icon.png",
       "tagline": "New Day One Film Experience",
       
@@ -15,7 +15,7 @@
       "screenshotUrls": [
         "https://w.enlan.bo/screenshot1.png"
       ],
-      "primaryCategory": "art",
+      "primaryCategory": "art-creativity",
       "tags": ["film", "camera", "photo"],
       "heroImageUrl": "https://w.enlan.bo/screenshot1.png",
       "ogImageUrl": "https://w.enlan.bo/screenshot1.png",
