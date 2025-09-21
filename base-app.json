@@ -5,7 +5,7 @@
   "iconUrl": "https://w.enlan.bo/app-icon.png",
   "splashImageUrl": "https://w.enlan.bo/app-icon.png",
   "splashBackgroundColor": "#FFFFFF",
-  "homeUrl": "https://w.enlan.bo/frame",
+  "homeUrl": "https://w.enlan.bo/frame-minikit",
   "primaryCategory": "entertainment",
   "screenshotUrls": [
     "https://w.enlan.bo/screenshot1.png"
