@@ -41,8 +41,8 @@ app.get('/api/photos', async (req, res) => {
       console.log(`Found ${blobs.length} blobs in ${folder}/`);
       
       // If no blobs found in specific folder, search for cover.jpg in all folders
-      if (blobs.length === 0 && folder === 'new-day-one') {
-        console.log('No blobs found in new-day-one folder, searching for cover.jpg in all folders...');
+      if (blobs.length === 0 && (folder === 'new-day-one' || folder === 'basecamp2025')) {
+        console.log(`No blobs found in ${folder} folder, searching for cover.jpg in all folders...`);
         const { blobs: allBlobs } = await list({
           limit: 1000
       });
@@ -108,9 +108,9 @@ app.get('/api/photos', async (req, res) => {
         createdTime: blob.uploadedAt
       }));
       
-      // For new-day-one folder, return all photos without pagination
-      if (folder === 'new-day-one') {
-        console.log(`Returning all ${allPhotos.length} photos for new-day-one folder`);
+      // For new-day-one and basecamp2025 folders, return all photos without pagination
+      if (folder === 'new-day-one' || folder === 'basecamp2025') {
+        console.log(`Returning all ${allPhotos.length} photos for ${folder} folder`);
         res.json({
           photos: allPhotos,
           hasMore: false,
@@ -140,6 +140,17 @@ app.get('/api/photos', async (req, res) => {
           { id: 4, src: '/images/724-70.JPG', alt: 'New Day One - 4', thumbnail: '/images/724-70.JPG' },
           { id: 5, src: '/images/84190002.JPG', alt: 'New Day One - 5', thumbnail: '/images/84190002.JPG' },
           { id: 6, src: '/images/84190003.JPG', alt: 'New Day One - 6', thumbnail: '/images/84190003.JPG' }
+        ];
+      } else if (folder === 'basecamp2025') {
+        // Sample photos for basecamp2025 collection
+        allPhotos = [
+          { id: 0, src: '/images/000044880004.jpg', alt: 'Basecamp 2025 - 1', thumbnail: '/images/000044880004.jpg' },
+          { id: 1, src: '/images/000044880005.jpg', alt: 'Basecamp 2025 - 2', thumbnail: '/images/000044880005.jpg' },
+          { id: 2, src: '/images/000044880006.jpg', alt: 'Basecamp 2025 - 3', thumbnail: '/images/000044880006.jpg' },
+          { id: 3, src: '/images/000044880007.jpg', alt: 'Basecamp 2025 - 4', thumbnail: '/images/000044880007.jpg' },
+          { id: 4, src: '/images/000044880008.jpg', alt: 'Basecamp 2025 - 5', thumbnail: '/images/000044880008.jpg' },
+          { id: 5, src: '/images/000044880009.jpg', alt: 'Basecamp 2025 - 6', thumbnail: '/images/000044880009.jpg' },
+          { id: 6, src: '/images/000044880010.jpg', alt: 'Basecamp 2025 - 7', thumbnail: '/images/000044880010.jpg' }
         ];
       } else {
         // Default photo-gallery collection
