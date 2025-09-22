@@ -446,29 +446,17 @@
                 return;
             }
 
+            // Create empty slides without loading images
             images.forEach((src, index) => {
                 const slide = document.createElement('div');
                 slide.className = 'slide';
                 slide.id = `slide${index}`;
-
-                const img = document.createElement('img');
-                img.src = src;
-                img.alt = `Slide ${index + 1}`;
-
-                img.onload = () => {
-                    log(`✅ Image ${index + 1} loaded: ${src}`);
-                };
-
-                img.onerror = () => {
-                    log(`❌ Image ${index + 1} failed: ${src}`);
-                };
-
-                slide.appendChild(img);
+                slide.dataset.src = src; // Store the image source for lazy loading
                 slideshow.appendChild(slide);
                 slides.push(slide);
             });
 
-            log(`✅ Created ${slides.length} slides`);
+            log(`✅ Created ${slides.length} empty slides for lazy loading`);
         }
 
         function showSlide(index) {
@@ -480,7 +468,27 @@
                 slide.classList.remove('active');
             });
             
-            slides[index].classList.add('active');
+            const currentSlideElement = slides[index];
+            
+            // Load image only if not already loaded
+            if (!currentSlideElement.querySelector('img')) {
+                const src = currentSlideElement.dataset.src;
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `Slide ${index + 1}`;
+                
+                img.onload = () => {
+                    log(`✅ Image ${index + 1} loaded: ${src}`);
+                };
+                
+                img.onerror = () => {
+                    log(`❌ Image ${index + 1} failed: ${src}`);
+                };
+                
+                currentSlideElement.appendChild(img);
+            }
+            
+            currentSlideElement.classList.add('active');
             currentSlide = index;
             updateCounter();
         }
@@ -534,7 +542,6 @@
             prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
             prevBtn.onclick = () => {
                 prevSlide();
-                startAutoPlay();
             };
 
             const counter = document.createElement('div');
@@ -546,7 +553,6 @@
             nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
             nextBtn.onclick = () => {
                 nextSlide();
-                startAutoPlay();
             };
 
             controls.appendChild(prevBtn);
@@ -601,10 +607,7 @@
                 showSlide(0);
                 hideLoading();
                 
-                // Start auto-play after a short delay
-                setTimeout(() => {
-                    startAutoPlay();
-                }, 1000);
+                // Auto-play disabled - manual navigation only
                 
                 log('✅ Full slideshow loaded with enhanced Base App compatibility');
                 
@@ -622,12 +625,10 @@
                 case 'ArrowLeft':
                     e.preventDefault();
                     prevSlide();
-                    startAutoPlay();
                     break;
                 case 'ArrowRight':
                     e.preventDefault();
                     nextSlide();
-                    startAutoPlay();
                     break;
                 case ' ':
                     e.preventDefault();
@@ -665,20 +666,10 @@
                 } else {
                     prevSlide();
                 }
-                startAutoPlay();
             }
         }
 
-        // Pause autoplay when page is not visible
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                stopAutoPlay();
-            } else {
-                if (!isLoading && slides.length > 0) {
-                    startAutoPlay();
-                }
-            }
-        });
+        // Auto-play disabled - no visibility change handling needed
 
         // Handle window resize
         window.addEventListener('resize', () => {
