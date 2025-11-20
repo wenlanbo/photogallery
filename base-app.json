@@ -12,5 +12,8 @@
   ],
   "heroImageUrl": "https://w.enlan.bo/screenshot1.png",
   "subtitle": "A Film Experience",
-  "author": "Wenlanbo"
+  "author": "Wenlanbo",
+  "baseBuilder": {
+    "ownerAddress": "0x07bB097c35DCdC825FeE6DCa07239317cD6C45E0"
+  }
 } 
